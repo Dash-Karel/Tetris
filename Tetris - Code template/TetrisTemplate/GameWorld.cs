@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
+using TetrisTemplate;
 
 /// <summary>
 /// A class for representing the game world.
@@ -38,6 +40,8 @@ class GameWorld
     /// </summary>
     TetrisGrid grid;
 
+    Block block;
+
     public GameWorld()
     {
         random = new Random();
@@ -46,10 +50,16 @@ class GameWorld
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
 
         grid = new TetrisGrid();
+
+        block = new ZBlock(grid);
     }
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
+        if(inputHelper.KeyPressed(Keys.D))
+            block.RotateRight();
+        if(inputHelper.KeyPressed(Keys.A))
+            block.RotateLeft();
     }
 
     public void Update(GameTime gameTime)
@@ -60,6 +70,7 @@ class GameWorld
     {
         spriteBatch.Begin();
         grid.Draw(gameTime, spriteBatch);
+        block.Draw(spriteBatch);
         spriteBatch.DrawString(font, "Hello!", Vector2.Zero, Color.Blue);
         spriteBatch.End();
     }
@@ -67,5 +78,4 @@ class GameWorld
     public void Reset()
     {
     }
-
 }

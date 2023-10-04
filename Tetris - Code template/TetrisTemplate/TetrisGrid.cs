@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 /// <summary>
@@ -6,15 +7,15 @@ using Microsoft.Xna.Framework.Graphics;
 /// </summary>
 class TetrisGrid
 {
-    enum cellType 
+    public enum cellType
     {
-        empty, 
-        yellow, 
-        lightBlue, 
-        purple, 
-        orange, 
-        darkBlue, 
-        green, 
+        empty,
+        yellow,
+        lightBlue,
+        purple,
+        orange,
+        darkBlue,
+        green,
         red
     }
 
@@ -24,19 +25,20 @@ class TetrisGrid
     /// The position at which this TetrisGrid should be drawn.
     Vector2 position, origin;
 
+    //array for mapping colours to a value
+    Color[] gridColors = new Color[] { Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+
     //array representing the grid
     cellType[,] grid;
 
-    //array for mapping colours to a value
-    Color[] gridColors = new Color[] {Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red};
+    public cellType[,] Grid { get { return grid; } }
 
     /// The number of grid elements in the x-direction.
     public int Width { get { return 10; } }
-   
+
     /// The number of grid elements in the y-direction.
     public int Height { get { return 20; } }
 
-    
     /// <summary>
     /// Creates a new TetrisGrid.
     /// </summary>
@@ -56,11 +58,11 @@ class TetrisGrid
     /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        for(int width = 0; width < Width; width++) 
+        for (int width = 0; width < Width; width++)
         {
-            for(int height = 0; height < Height; height++)
+            for (int height = 0; height < Height; height++)
             {
-                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), gridColors[ (int)grid[width, height] ]); 
+                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), gridColors[(int)grid[width, height]]);
             }
         }
     }
@@ -71,13 +73,26 @@ class TetrisGrid
     public void Clear()
     {
         grid = new cellType[Width, Height];
-        grid[1, 9] = cellType.darkBlue;
-        grid[3, 10] = cellType.lightBlue;
-        grid[1, 11] = cellType.yellow;
-        grid[5,8] = cellType.green;
-        grid[9, 19] = cellType.purple;
-        grid[7, 12] = cellType.red;
-        grid[8, 13] = cellType.orange;
+    }
+
+    public void SetValueInGrid(Point index, cellType value)
+    {
+        if (index.X < 0 || index.Y < 0 || index.X >= Width || index.Y >= Height)
+            Debug.WriteLine("index out of range" + index);
+        else
+            grid[index.X, index.Y] = value;
+    }
+
+    public Vector2 GetPositionOfCell(int cellX, int cellY)
+    {
+        return position - origin + new Vector2(cellX * emptyCell.Width, cellY * emptyCell.Height);
+    }
+    public Point GetCellAtPosition(Vector2 worldPosition)
+    {
+        Vector2 offset = worldPosition - (position - origin);
+        int x = (int)offset.X / emptyCell.Width;
+        int y = (int)offset.Y / emptyCell.Height;
+        return new Point(x, y);
     }
 }
 

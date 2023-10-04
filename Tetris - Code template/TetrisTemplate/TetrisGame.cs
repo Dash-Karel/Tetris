@@ -39,7 +39,7 @@ class TetrisGame : Game
         Content.RootDirectory = "Content";
 
         // set the desired window size
-        ScreenSize = new Point(800, 600);
+        ScreenSize = new Point(800, 620);
         graphics.PreferredBackBufferWidth = ScreenSize.X;
         graphics.PreferredBackBufferHeight = ScreenSize.Y;
 
@@ -58,6 +58,7 @@ class TetrisGame : Game
 
     protected override void Update(GameTime gameTime)
     {
+        this.IsMouseVisible = true;
         inputHelper.Update(gameTime);
         gameWorld.HandleInput(gameTime, inputHelper);
         gameWorld.Update(gameTime);
