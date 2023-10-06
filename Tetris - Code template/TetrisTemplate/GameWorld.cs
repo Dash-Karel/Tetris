@@ -16,7 +16,8 @@ class GameWorld
     enum GameState
     {
         Playing,
-        GameOver
+        GameOver,
+        MainMenu
     }
 
     /// <summary>
@@ -46,6 +47,7 @@ class GameWorld
     RandomBag bag;
 
     GameOverScreen gameOverScreen;
+    MainMenu mainMenu;
 
     float secondsUntilNextTick;
     float secondsPerTick = 1;
@@ -57,7 +59,7 @@ class GameWorld
     public GameWorld()
     {
         random = new Random();
-        gameState = GameState.Playing;
+        gameState = GameState.MainMenu;
 
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
 
@@ -66,6 +68,7 @@ class GameWorld
         bag = new RandomBag();
 
         gameOverScreen = new GameOverScreen(font);
+        mainMenu = new MainMenu(font);
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
@@ -104,29 +107,40 @@ class GameWorld
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        if(gameState == GameState.Playing)
+        switch(gameState)
         {
-            UpdateTickTime(gameTime);
-            HandleInput(gameTime, inputHelper);
+            case GameState.MainMenu:
+                mainMenu.Update();
+                break;
+            case GameState.Playing:
+                UpdateTickTime(gameTime);
+                HandleInput(gameTime, inputHelper);
+                break;
+            case GameState.GameOver:
+                gameOverScreen.Update();
+                break;
         }
-        else
-        {
-            gameOverScreen.Update();
-        } 
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
-        grid.Draw(gameTime, spriteBatch);
-        block.Draw(spriteBatch);
-        previewBlock.Draw(spriteBatch);
-        spriteBatch.DrawString(font, "Level: " + level.ToString(), Vector2.Zero, Color.White);
-        spriteBatch.DrawString(font, "Score: " + score.ToString(), new Vector2(0, font.LineSpacing), Color.White);
-        if (gameState == GameState.GameOver)
-        {
-            gameOverScreen.Draw(spriteBatch);
+        switch (gameState)
+        {   
+            case GameState.MainMenu:
+                mainMenu.Draw(spriteBatch);
+                break;
+            case GameState.Playing:
+                DrawPlaying(gameTime, spriteBatch);
+                break;
+
+            case GameState.GameOver:
+                DrawPlaying(gameTime, spriteBatch);
+                gameOverScreen.Draw(spriteBatch);
+                break;
+            
         }
+        
         spriteBatch.End();
     }
 
@@ -195,5 +209,18 @@ class GameWorld
         secondsUntilNextTick = secondsPerTick;
     }
 
+    void DrawPlaying(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        grid.Draw(gameTime, spriteBatch);
+        block.Draw(spriteBatch);
+        previewBlock.Draw(spriteBatch);
+        spriteBatch.DrawString(font, "Level: " + level.ToString(), Vector2.Zero, Color.White);
+        spriteBatch.DrawString(font, "Score: " + score.ToString(), new Vector2(0, font.LineSpacing), Color.White);
+    }
+
+    public void StartNormalGame()
+    {
+        gameState = GameState.Playing;
+    }
 
 }

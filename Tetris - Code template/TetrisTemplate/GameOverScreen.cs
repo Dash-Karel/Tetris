@@ -12,7 +12,7 @@ namespace TetrisTemplate
         Vector2 mainMenuPos, replayPos, gameOverPos;
         Vector2 buttonSize;
         Button mainMenuBut, replayBut;
-        public string gameOverText;
+        string gameOverText;
         string mainMenuText, replayText;
         public GameOverScreen(SpriteFont _standardFont) 
         {
