@@ -47,10 +47,31 @@ namespace TetrisTemplate
         }
         void PlaceBlock()
         {
+            //variable for keeping track of where the actual bottom of the block is
+            int bottomOfBlockCoordinate = 0;
+
+            //place the block in the grid
             for (int x = 0; x < Size; x++)
                 for (int y = 0; y < Size; y++)
-                    if (shape[x, y] == true)
+                    if (shape[x, y])
+                    {
+                        bottomOfBlockCoordinate = y;
                         grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
+                    }
+
+            //If the bottom of the block lies outside the grid when placing it the game is over
+            if (position.Y + bottomOfBlockCoordinate < 0)
+            {
+                TetrisGame.GameWorld.GameOver();
+                return;
+            }
+
+            // Check if any of the lines got full
+            int[] yCoordinates = new int[Size];
+            for (int y = 0; y < Size; y++)
+                yCoordinates[y] = position.Y + y;
+
+            grid.CheckLines(yCoordinates);
         }
         public void MoveToSpawnPosition()
         {
@@ -108,10 +129,7 @@ namespace TetrisTemplate
             {
                 position.Y--;
                 PlaceBlock();
-                
-                //testing instruction
-                
-
+                TetrisGame.GameWorld.NewBlocks();
                 return false;
             }
             return true;

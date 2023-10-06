@@ -26,7 +26,7 @@ class TetrisGrid
     Vector2 position, origin;
 
     //array for mapping colours to a value
-    Color[] cellColors = new Color[] { Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
 
     //array representing the grid
     CellType[,] grid;
@@ -84,6 +84,52 @@ class TetrisGrid
         else
             grid[cell.X, cell.Y] = value;
     }
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    public void CheckLines(int[] yCoordinates)
+    {
+        int LinesCleared = 0;
+        foreach (int yCoordinate in yCoordinates)
+        {
+            if (yCoordinate >= Height || yCoordinate < 0)
+                return;
+
+            bool lineFull = true;
+            for (int x = 0; x < Width; x++)
+            {
+                if (grid[x, yCoordinate] == CellType.empty)
+                {
+                    lineFull = false;
+                    break;
+                }
+            }
+
+            if (lineFull)
+            {
+                DeleteLine(yCoordinate);
+                LinesCleared++;
+            }
+        }
+        if(LinesCleared > 0)
+            TetrisGame.GameWorld.IncreaseScore(LinesCleared);
+    }
+    void DeleteLine(int yCoordinate)
+    {
+        for(int x = 0; x < Width; x++)
+        { 
+            grid[x, yCoordinate] = CellType.empty;                
+        }
+        MoveCellsDown(yCoordinate);
+    }
+    void MoveCellsDown(int startingYCoordinate)
+    {
+        for(int x=0; x < Width; x++)
+            for (int y = startingYCoordinate; y > 0; y--)
+                grid[x,y] = grid[x,y - 1];
+    }
+    //-------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+
     public Point GetCellAtPosition(Vector2 worldPosition)
     {
         Vector2 offset = worldPosition - position - origin;

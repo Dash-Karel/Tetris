@@ -47,10 +47,12 @@ class GameWorld
 
     GameOverScreen gameOverScreen;
 
-    float secondsUntilNextTick = 1;
+    float secondsUntilNextTick;
     float secondsPerTick = 1;
 
-    bool dead = true;
+    int score;
+    int level;
+
 
     public GameWorld()
     {
@@ -62,6 +64,13 @@ class GameWorld
         grid = new TetrisGrid();
 
         bag = new RandomBag();
+        
+        secondsUntilNextTick = secondsPerTick;
+        secondsPerTick = 1;
+
+        score = 0;
+        level = 1;
+
 
         gameOverScreen = new GameOverScreen(font);
 
@@ -85,19 +94,18 @@ class GameWorld
 
         if (inputHelper.KeyPressed(Keys.Down))
         {
-            BlockMoveDown();
+            block.MoveDown();
         }
 
         if (inputHelper.KeyPressed(Keys.Space))
         {
             block.HardDrop();
-            NewBlocks();
         }
     }
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        if(!dead)
+        if(gameState == GameState.Playing)
         {
             UpdateTickTime(gameTime);
             HandleInput(gameTime, inputHelper);
@@ -114,22 +122,46 @@ class GameWorld
         grid.Draw(gameTime, spriteBatch);
         block.Draw(spriteBatch);
         previewBlock.Draw(spriteBatch);
-        spriteBatch.DrawString(font, "Hello!", Vector2.Zero, Color.Blue);
-        if (dead)
+        spriteBatch.DrawString(font, "Level: " + level.ToString(), Vector2.Zero, Color.White);
+        spriteBatch.DrawString(font, "Score: " + score.ToString(), new Vector2(0, font.LineSpacing), Color.White);
+        if (gameState == GameState.GameOver)
         {
             gameOverScreen.Draw(spriteBatch);
         }
         spriteBatch.End();
     }
 
+    public void GameOver()
+    {
+        gameState = GameState.GameOver;
+    }
+
     public void Reset()
     {
     }
-    void NewBlocks()
+    public void NewBlocks()
     {
+        secondsUntilNextTick = secondsPerTick;
         block = previewBlock;
         block.MoveToSpawnPosition();
         previewBlock = bag.NextBlock(grid);
+    }
+    public void IncreaseScore(int LinesCleared)
+    {
+        if (LinesCleared == 4)
+            score += 800 * level;
+        else
+            score += (2 * LinesCleared - 1) * 100 * level;
+
+        if(score >  500 * (level * (level + 1)))
+        {
+            IncreaseLevel();
+        }
+    }
+    void IncreaseLevel()
+    {
+        level++;
+        secondsPerTick = MathF.Pow((0.8f - ((level - 1) * 0.007f)), level - 1);
     }
     void UpdateTickTime(GameTime gameTime)
     {
@@ -146,18 +178,11 @@ class GameWorld
     void ExecuteTick() 
     {
         //Moving the current block down.
-        BlockMoveDown();
+        block.MoveDown();
 
         //Resetting the tick timer.
         secondsUntilNextTick = secondsPerTick;
     }
 
-    void BlockMoveDown() 
-    {
-        //Moving the current block down and switch to a new block if it hits the bottem
-        if (!block.MoveDown())
-        {
-            NewBlocks();
-        }
-    }
+
 }
