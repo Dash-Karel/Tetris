@@ -7,7 +7,8 @@ class TetrisGame : Game
 {
     SpriteBatch spriteBatch;
     InputHelper inputHelper;
-    GameWorld gameWorld;
+
+    static GameWorld gameWorld;
 
     /// <summary>
     /// A static reference to the ContentManager object, used for loading assets.
@@ -67,6 +68,10 @@ class TetrisGame : Game
     {
         GraphicsDevice.Clear(Color.White);
         gameWorld.Draw(gameTime, spriteBatch);
+    }
+    public static GameWorld GameWorld
+    {
+        get { return gameWorld; }
     }
 }
 
