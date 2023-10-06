@@ -145,6 +145,8 @@ class GameWorld
         score = 0;
         level = 1;
 
+        grid.Clear();
+
         previewBlock = bag.NextBlock(grid);
         NewBlocks();
     }
@@ -162,7 +164,7 @@ class GameWorld
         else
             score += (2 * LinesCleared - 1) * 100 * level;
 
-        if(score >  500 * (level * (level + 1)))
+        if(score >=  500 * (level * (level + 1)))
         {
             IncreaseLevel();
         }
