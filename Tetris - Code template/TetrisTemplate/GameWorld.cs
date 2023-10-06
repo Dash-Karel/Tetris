@@ -44,8 +44,11 @@ class GameWorld
     Block previewBlock;
 
     RandomBag bag;
+
     float secondsUntilNextTick = 1;
     float secondsPerTick = 1;
+
+    bool dead = false;
 
     public GameWorld()
     {
@@ -88,9 +91,10 @@ class GameWorld
         }
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime, InputHelper inputHelper)
     {
         UpdateTickTime(gameTime);
+        HandleInput(gameTime, inputHelper);
 
     }
 
