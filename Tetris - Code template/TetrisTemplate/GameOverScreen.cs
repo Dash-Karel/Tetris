@@ -61,7 +61,7 @@ namespace TetrisTemplate
         }
         void MainMenuPressed()
         {
-
+            TetrisGame.GameWorld.ReturnToMainMenu();
         }
     }
 }

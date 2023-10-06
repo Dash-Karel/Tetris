@@ -222,5 +222,9 @@ class GameWorld
     {
         gameState = GameState.Playing;
     }
+    public void ReturnToMainMenu() 
+    {
+        gameState = GameState.MainMenu;
+    }
 
 }
