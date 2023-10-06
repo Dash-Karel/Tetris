@@ -44,7 +44,8 @@ class GameWorld
     Block previewBlock;
 
     RandomBag bag;
-
+    float secondsUntilNextTick = 1;
+    float secondsPerTick = 1;
 
     public GameWorld()
     {
@@ -77,8 +78,7 @@ class GameWorld
 
         if (inputHelper.KeyPressed(Keys.Down))
         {
-            if (!block.MoveDown())
-                NewBlocks();
+            BlockMoveDown();
         }
 
         if (inputHelper.KeyPressed(Keys.Space))
@@ -90,6 +90,8 @@ class GameWorld
 
     public void Update(GameTime gameTime)
     {
+        UpdateTickTime(gameTime);
+
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -110,5 +112,34 @@ class GameWorld
         block = previewBlock;
         block.MoveToSpawnPosition();
         previewBlock = bag.NextBlock(grid);
+    }
+    void UpdateTickTime(GameTime gameTime)
+    {
+        //Subtracting the time since the next frame from the seconds until the next tick.
+        secondsUntilNextTick -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        //Checking if its time to execute a tick
+        if (secondsUntilNextTick < 0)
+        {
+            //Calling the Execute tick function.
+            ExecuteTick();
+        }
+    }
+    void ExecuteTick() 
+    {
+        //Moving the current block down.
+        BlockMoveDown();
+
+        //Resetting the tick timer.
+        secondsUntilNextTick = secondsPerTick;
+    }
+
+    void BlockMoveDown() 
+    {
+        //Moving the current block down and switch to a new block if it hits the bottem
+        if (!block.MoveDown())
+        {
+            NewBlocks();
+        }
     }
 }
