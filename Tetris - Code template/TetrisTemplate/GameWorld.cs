@@ -45,9 +45,6 @@ class GameWorld
 
     RandomBag bag;
 
-    float secondsUntilNextTick = 1;
-    float secondsPerTick = 1;
-
 
     public GameWorld()
     {
@@ -93,8 +90,6 @@ class GameWorld
 
     public void Update(GameTime gameTime)
     {
-        UpdateTick(gameTime);
-
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -115,20 +110,5 @@ class GameWorld
         block = previewBlock;
         block.MoveToSpawnPosition();
         previewBlock = bag.NextBlock(grid);
-    }
-    public void UpdateTick(GameTime gameTime)
-    {
-        //Subtracting the time since the next frame from the seconds until the next tick.
-        secondsUntilNextTick -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        //Checking 
-        if (secondsUntilNextTick < 0)
-        {
-            if (!block.MoveDown())
-            {
-                NewBlocks();
-            }
-            secondsUntilNextTick = secondsPerTick;
-        }
     }
 }
