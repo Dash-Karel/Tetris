@@ -80,8 +80,7 @@ class GameWorld
 
         if (inputHelper.KeyPressed(Keys.Down))
         {
-            if (!block.MoveDown())
-                NewBlocks();
+            BlockMoveDown();
         }
 
         if (inputHelper.KeyPressed(Keys.Space))
@@ -93,7 +92,7 @@ class GameWorld
 
     public void Update(GameTime gameTime)
     {
-        UpdateTick(gameTime);
+        UpdateTickTime(gameTime);
 
     }
 
@@ -116,19 +115,33 @@ class GameWorld
         block.MoveToSpawnPosition();
         previewBlock = bag.NextBlock(grid);
     }
-    public void UpdateTick(GameTime gameTime)
+    void UpdateTickTime(GameTime gameTime)
     {
         //Subtracting the time since the next frame from the seconds until the next tick.
         secondsUntilNextTick -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        //Checking 
+        //Checking if its time to execute a tick
         if (secondsUntilNextTick < 0)
         {
-            if (!block.MoveDown())
-            {
-                NewBlocks();
-            }
-            secondsUntilNextTick = secondsPerTick;
+            //Calling the Execute tick function.
+            ExecuteTick();
+        }
+    }
+    void ExecuteTick() 
+    {
+        //Moving the current block down.
+        BlockMoveDown();
+
+        //Resetting the tick timer.
+        secondsUntilNextTick = secondsPerTick;
+    }
+
+    void BlockMoveDown() 
+    {
+        //Moving the current block down and switch to a new block if it hits the bottem
+        if (!block.MoveDown())
+        {
+            NewBlocks();
         }
     }
 }
