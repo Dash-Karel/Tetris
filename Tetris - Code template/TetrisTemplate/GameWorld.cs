@@ -44,7 +44,8 @@ class GameWorld
     Block previewBlock;
 
     RandomBag bag;
-
+    float secondsUntilNextTick = 1;
+    float secondsPerTick = 1;
 
     public GameWorld()
     {
