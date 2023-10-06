@@ -45,10 +45,12 @@ class GameWorld
 
     RandomBag bag;
 
+    GameOverScreen gameOverScreen;
+
     float secondsUntilNextTick = 1;
     float secondsPerTick = 1;
 
-    bool dead = false;
+    bool dead = true;
 
     public GameWorld()
     {
@@ -60,6 +62,8 @@ class GameWorld
         grid = new TetrisGrid();
 
         bag = new RandomBag();
+
+        gameOverScreen = new GameOverScreen(font);
 
         previewBlock = bag.NextBlock(grid);
         NewBlocks();
@@ -93,9 +97,15 @@ class GameWorld
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        UpdateTickTime(gameTime);
-        HandleInput(gameTime, inputHelper);
-
+        if(!dead)
+        {
+            UpdateTickTime(gameTime);
+            HandleInput(gameTime, inputHelper);
+        }
+        else
+        {
+            gameOverScreen.Update();
+        } 
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -105,6 +115,10 @@ class GameWorld
         block.Draw(spriteBatch);
         previewBlock.Draw(spriteBatch);
         spriteBatch.DrawString(font, "Hello!", Vector2.Zero, Color.Blue);
+        if (dead)
+        {
+            gameOverScreen.Draw(spriteBatch);
+        }
         spriteBatch.End();
     }
 
