@@ -47,10 +47,16 @@ namespace TetrisTemplate
         }
         void PlaceBlock()
         {
+            //place the block in the grid
             for (int x = 0; x < Size; x++)
                 for (int y = 0; y < Size; y++)
                     if (shape[x, y] == true)
                         grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
+
+            // Check if any of the lines got full
+            for (int y = 0; y < Size; y++)
+                grid.CheckLine(position.Y + y);
+
         }
         public void MoveToSpawnPosition()
         {

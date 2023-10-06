@@ -84,6 +84,42 @@ class TetrisGrid
         else
             grid[cell.X, cell.Y] = value;
     }
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    public void CheckLine(int yCoordinate)
+    {
+        if (yCoordinate >= Height || yCoordinate < 0)
+            return;
+
+        bool lineFull = true;
+        for (int x = 0; x < Width; x++) 
+        {
+            if(grid[x, yCoordinate] == CellType.empty)
+            {
+                lineFull = false;
+                break;
+            }
+        }
+        if(lineFull)
+            DeleteLine(yCoordinate);
+    }
+    void DeleteLine(int yCoordinate)
+    {
+        for(int x = 0; x < Width; x++)
+        { 
+            grid[x, yCoordinate] = CellType.empty;                
+        }
+        MoveCellsDown(yCoordinate);
+    }
+    void MoveCellsDown(int startingYCoordinate)
+    {
+        for(int x=0; x < Width; x++)
+            for (int y = startingYCoordinate; y > 0; y--)
+                grid[x,y] = grid[x,y - 1];
+    }
+    //-------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+
     public Point GetCellAtPosition(Vector2 worldPosition)
     {
         Vector2 offset = worldPosition - position - origin;
