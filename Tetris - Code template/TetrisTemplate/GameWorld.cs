@@ -64,15 +64,14 @@ class GameWorld
         grid = new TetrisGrid();
 
         bag = new RandomBag();
-        
+
+        gameOverScreen = new GameOverScreen(font);
+
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
 
         score = 0;
         level = 1;
-
-
-        gameOverScreen = new GameOverScreen(font);
 
         previewBlock = bag.NextBlock(grid);
         NewBlocks();
@@ -138,6 +137,16 @@ class GameWorld
 
     public void Reset()
     {
+        gameState = GameState.Playing;
+
+        secondsUntilNextTick = secondsPerTick;
+        secondsPerTick = 1;
+
+        score = 0;
+        level = 1;
+
+        previewBlock = bag.NextBlock(grid);
+        NewBlocks();
     }
     public void NewBlocks()
     {
