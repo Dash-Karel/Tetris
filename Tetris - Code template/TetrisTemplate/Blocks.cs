@@ -7,9 +7,12 @@ namespace TetrisTemplate
     internal class Block
     {
         Texture2D texture;
+        TetrisGrid grid;
 
-        protected Vector2 position;
-        protected Color color;
+        //represents the position within the grid
+        protected Point position;
+
+        protected TetrisGrid.CellType color;
         protected bool[,] shape;
 
         int Size
@@ -17,12 +20,42 @@ namespace TetrisTemplate
             get { return shape.GetLength(0); }
         }
 
-        //final version protected
         protected Block(TetrisGrid grid)
         {
             texture = TetrisGame.ContentManager.Load<Texture2D>("block");
+            this.grid = grid;
         }
-
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            for (int width = 0; width < Size; width++)
+            {
+                for (int height = 0; height < Size; height++)
+                {
+                    if (shape[width, height] == true)
+                        spriteBatch.Draw(texture, grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height), grid.CellColors[(int)color]);
+                }
+            }
+        }
+        bool MoveWasValid()
+        {
+            for (int x = 0; x < Size; x++)
+                for (int y = 0; y < Size; y++)
+                    if (shape[x, y] == true)
+                        if (!grid.CellIsValid(new Point(position.X + x, position.Y + y)))
+                            return false;
+            return true;
+        }
+        void PlaceBlock()
+        {
+            for (int x = 0; x < Size; x++)
+                for (int y = 0; y < Size; y++)
+                    if (shape[x, y] == true)
+                        grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
+        }
+        public void MoveToSpawnPosition()
+        {
+            position -= new Point(8, 10);
+        }
         public void RotateLeft()
         {
             //requires square grids for the shapes
@@ -34,7 +67,10 @@ namespace TetrisTemplate
                     newShape[x, y] = shape[Size - 1 - y, x];
                 }
             }
+            bool[,] originalShape = shape;
             shape = newShape;
+            if (!MoveWasValid())
+                shape = originalShape;
         }
         public void RotateRight()
         {
@@ -47,18 +83,42 @@ namespace TetrisTemplate
                     newShape[x, y] = shape[y, Size - 1 - x];
                 }
             }
+            bool[,] originalShape = shape;
             shape = newShape;
+            if (!MoveWasValid())
+                shape = originalShape;
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public void MoveLeft() 
+        { 
+            position.X--;
+            if (!MoveWasValid())
+                position.X++; 
+        }
+        public void MoveRight()
         {
-            for (int width = 0; width < Size; width++)
+            position.X++;
+            if(!MoveWasValid())
+                position.X--;
+        }
+        public bool MoveDown()
+        {
+            //moves the block down once if possible and returns false when the block is placed as the block didn't move
+            position.Y++;
+            if (!MoveWasValid())
             {
-                for (int height = 0; height < Size; height++)
-                {
-                    if (shape[width, height] == true)
-                        spriteBatch.Draw(texture, position + new Vector2(width * texture.Width, height * texture.Height), color);
-                }
+                position.Y--;
+                PlaceBlock();
+                
+                //testing instruction
+                
+
+                return false;
             }
+            return true;
+        }
+        public void HardDrop()
+        {
+            while (MoveDown());
         }
     }
     internal class OBlock : Block
@@ -66,8 +126,8 @@ namespace TetrisTemplate
         public OBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { true, true }, { true, true } };
-            color = Color.Yellow;
-            position = grid.GetPositionOfCell(4, -2);
+            color = TetrisGrid.CellType.yellow;
+            position = new Point(12, 8);
         }
     }
     internal class IBlock : Block
@@ -75,8 +135,8 @@ namespace TetrisTemplate
         public IBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { false, true, false, false}, { false, true, false, false}, { false, true, false, false}, { false, true, false, false } };
-            color = Color.LightBlue;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.lightBlue;
+            position = new Point(11, 8);
         }
     }
     internal class TBlock : Block
@@ -84,8 +144,8 @@ namespace TetrisTemplate
         public TBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { false, true, false}, { true, true, false}, { false, true, false} };
-            color = Color.Purple;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.purple;
+            position = new Point(11, 8);
         }
     }
     internal class LBlock : Block
@@ -93,8 +153,8 @@ namespace TetrisTemplate
         public LBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { false, true, false }, { false, true, false }, { true, true, false } };
-            color = Color.Orange;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.orange;
+            position = new Point(11, 8);
         }
     }
     internal class JBlock : Block
@@ -102,8 +162,8 @@ namespace TetrisTemplate
         public JBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { true, true, false }, { false, true, false }, { false, true, false } };
-            color = Color.DarkBlue;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.darkBlue;
+            position = new Point(11, 8);
         }
     }
     internal class SBlock : Block
@@ -111,8 +171,8 @@ namespace TetrisTemplate
         public SBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { false, true, false }, { true, true, false }, { true, false, false } };
-            color = Color.Green;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.green;
+            position = new Point(11, 8);
         }
     }
     internal class ZBlock : Block
@@ -120,8 +180,8 @@ namespace TetrisTemplate
         public ZBlock(TetrisGrid grid) : base(grid)
         {
             shape = new bool[,] { { true, false, false }, { true, true, false }, { false, true, false } };
-            color = Color.Red;
-            position = grid.GetPositionOfCell(3, -2);
+            color = TetrisGrid.CellType.red;
+            position = new Point(11, 8);
         }
     }
 }

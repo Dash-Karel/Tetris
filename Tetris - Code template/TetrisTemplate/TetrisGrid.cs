@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 /// </summary>
 class TetrisGrid
 {
-    public enum cellType
+    public enum CellType
     {
         empty,
         yellow,
@@ -26,12 +26,14 @@ class TetrisGrid
     Vector2 position, origin;
 
     //array for mapping colours to a value
-    Color[] gridColors = new Color[] { Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+    Color[] cellColors = new Color[] { Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
 
     //array representing the grid
-    cellType[,] grid;
+    CellType[,] grid;
 
-    public cellType[,] Grid { get { return grid; } }
+    public CellType[,] Grid { get { return grid; } }
+
+    public Color[] CellColors { get { return cellColors; } }
 
     /// The number of grid elements in the x-direction.
     public int Width { get { return 10; } }
@@ -62,7 +64,7 @@ class TetrisGrid
         {
             for (int height = 0; height < Height; height++)
             {
-                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), gridColors[(int)grid[width, height]]);
+                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), cellColors[(int)grid[width, height]]);
             }
         }
     }
@@ -72,27 +74,46 @@ class TetrisGrid
     /// </summary>
     public void Clear()
     {
-        grid = new cellType[Width, Height];
+        grid = new CellType[Width, Height];
     }
 
-    public void SetValueInGrid(Point index, cellType value)
+    public void SetValueInGrid(Point cell, CellType value)
     {
-        if (index.X < 0 || index.Y < 0 || index.X >= Width || index.Y >= Height)
-            Debug.WriteLine("index out of range" + index);
+        if (!CellIsWithinGrid(cell))
+            Debug.WriteLine("index out of range" + cell);
         else
-            grid[index.X, index.Y] = value;
-    }
-
-    public Vector2 GetPositionOfCell(int cellX, int cellY)
-    {
-        return position - origin + new Vector2(cellX * emptyCell.Width, cellY * emptyCell.Height);
+            grid[cell.X, cell.Y] = value;
     }
     public Point GetCellAtPosition(Vector2 worldPosition)
     {
-        Vector2 offset = worldPosition - (position - origin);
+        Vector2 offset = worldPosition - position - origin;
         int x = (int)offset.X / emptyCell.Width;
         int y = (int)offset.Y / emptyCell.Height;
         return new Point(x, y);
+    }
+    public Vector2 GetPositionOfCell(Point cell)
+    {
+        return position - origin + new Vector2(cell.X * emptyCell.Width, cell.Y * emptyCell.Height);
+    }
+    public bool CellIsValid(Point cell)
+    {
+        //return true if the cell is still above the grid, as it should be able to move in that case
+        if (cell.Y < 0 && cell.X >= 0 && cell.X < Width )
+            return true;
+
+        //returns true if the cell is within the grid and not already occupied or if the cell is still above the grid
+        if (CellIsWithinGrid(cell))
+            if (!CellIsOccupied(cell))
+                return true;
+        return false;
+    }
+    bool CellIsWithinGrid(Point cell)
+    {
+        return cell.X >= 0 && cell.X < Width && cell.Y >= 0 && cell.Y < Height;
+    }
+    bool CellIsOccupied(Point cell)
+    {
+        return grid[cell.X, cell.Y] != CellType.empty;
     }
 }
 

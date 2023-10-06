@@ -58,7 +58,6 @@ class TetrisGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        this.IsMouseVisible = true;
         inputHelper.Update(gameTime);
         gameWorld.HandleInput(gameTime, inputHelper);
         gameWorld.Update(gameTime);
