@@ -114,10 +114,7 @@ namespace TetrisTemplate
             {
                 position.Y--;
                 PlaceBlock();
-                
-                //testing instruction
-                
-
+                TetrisGame.GameWorld.NewBlocks();
                 return false;
             }
             return true;

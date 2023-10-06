@@ -78,13 +78,12 @@ class GameWorld
 
         if (inputHelper.KeyPressed(Keys.Down))
         {
-            BlockMoveDown();
+            block.MoveDown();
         }
 
         if (inputHelper.KeyPressed(Keys.Space))
         {
             block.HardDrop();
-            NewBlocks();
         }
     }
 
@@ -107,7 +106,7 @@ class GameWorld
     public void Reset()
     {
     }
-    void NewBlocks()
+    public void NewBlocks()
     {
         block = previewBlock;
         block.MoveToSpawnPosition();
@@ -128,18 +127,9 @@ class GameWorld
     void ExecuteTick() 
     {
         //Moving the current block down.
-        BlockMoveDown();
+        block.MoveDown();
 
         //Resetting the tick timer.
         secondsUntilNextTick = secondsPerTick;
-    }
-
-    void BlockMoveDown() 
-    {
-        //Moving the current block down and switch to a new block if it hits the bottem
-        if (!block.MoveDown())
-        {
-            NewBlocks();
-        }
     }
 }

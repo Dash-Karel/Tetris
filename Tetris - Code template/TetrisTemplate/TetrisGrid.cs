@@ -26,7 +26,7 @@ class TetrisGrid
     Vector2 position, origin;
 
     //array for mapping colours to a value
-    Color[] cellColors = new Color[] { Color.White, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
 
     //array representing the grid
     CellType[,] grid;
