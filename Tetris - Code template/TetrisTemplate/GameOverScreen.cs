@@ -57,7 +57,7 @@ namespace TetrisTemplate
         }
         void ReplayPressed()
         {
-
+            TetrisGame.GameWorld.Reset();
         }
         void MainMenuPressed()
         {
