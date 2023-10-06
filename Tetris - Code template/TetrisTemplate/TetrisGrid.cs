@@ -86,22 +86,32 @@ class TetrisGrid
     }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    public void CheckLine(int yCoordinate)
+    public void CheckLines(int[] yCoordinates)
     {
-        if (yCoordinate >= Height || yCoordinate < 0)
-            return;
-
-        bool lineFull = true;
-        for (int x = 0; x < Width; x++) 
+        int LinesCleared = 0;
+        foreach (int yCoordinate in yCoordinates)
         {
-            if(grid[x, yCoordinate] == CellType.empty)
+            if (yCoordinate >= Height || yCoordinate < 0)
+                return;
+
+            bool lineFull = true;
+            for (int x = 0; x < Width; x++)
             {
-                lineFull = false;
-                break;
+                if (grid[x, yCoordinate] == CellType.empty)
+                {
+                    lineFull = false;
+                    break;
+                }
+            }
+
+            if (lineFull)
+            {
+                DeleteLine(yCoordinate);
+                LinesCleared++;
             }
         }
-        if(lineFull)
-            DeleteLine(yCoordinate);
+        if(LinesCleared > 0)
+            TetrisGame.GameWorld.IncreaseScore(LinesCleared);
     }
     void DeleteLine(int yCoordinate)
     {
