@@ -20,6 +20,8 @@ class TetrisGame : Game
     /// </summary>
     public static Point ScreenSize { get; private set; }
 
+    
+
     [STAThread]
     static void Main(string[] args)
     {
@@ -61,6 +63,7 @@ class TetrisGame : Game
         inputHelper.Update(gameTime);
         gameWorld.HandleInput(gameTime, inputHelper);
         gameWorld.Update(gameTime);
+
     }
 
     protected override void Draw(GameTime gameTime)
@@ -68,5 +71,7 @@ class TetrisGame : Game
         GraphicsDevice.Clear(Color.White);
         gameWorld.Draw(gameTime, spriteBatch);
     }
+
+    
 }
 
