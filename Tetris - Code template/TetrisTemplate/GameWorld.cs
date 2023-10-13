@@ -170,6 +170,7 @@ class GameWorld
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
         mediaPlayer.Update();
+
         switch (gameState)
         {
             case GameState.MainMenu:
@@ -200,8 +201,7 @@ class GameWorld
             case GameState.GameOver:
                 DrawPlaying(gameTime, spriteBatch);
                 gameOverScreen.Draw(spriteBatch);
-                break;
-            
+                break;      
         }
         
         spriteBatch.End();
