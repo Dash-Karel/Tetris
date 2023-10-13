@@ -14,7 +14,7 @@ class TetrisGame : Game
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>
     public static ContentManager ContentManager { get; private set; }
-    
+
 
     /// <summary>
     /// A static reference to the width and height of the screen.
@@ -29,13 +29,13 @@ class TetrisGame : Game
     }
 
     public TetrisGame()
-    {        
+    {
         // initialize the graphics device
         GraphicsDeviceManager graphics = new GraphicsDeviceManager(this);
 
         // store a static reference to the content manager, so other objects can use it
         ContentManager = Content;
-        
+
         // set the directory where game assets are located
         Content.RootDirectory = "Content";
 
@@ -46,6 +46,8 @@ class TetrisGame : Game
 
         // create the input helper object
         inputHelper = new InputHelper();
+
+
     }
 
     protected override void LoadContent()
@@ -53,8 +55,8 @@ class TetrisGame : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // create and reset the game world
-        gameWorld = new GameWorld();
-        
+        gameWorld = new GameWorld(this);
+        gameWorld.Reset();
     }
 
     protected override void Update(GameTime gameTime)
@@ -71,6 +73,10 @@ class TetrisGame : Game
     public static GameWorld GameWorld
     {
         get { return gameWorld; }
+    }
+    public void SetMouseVisible(bool isVisible)
+    {
+        IsMouseVisible = isVisible;
     }
 }
 

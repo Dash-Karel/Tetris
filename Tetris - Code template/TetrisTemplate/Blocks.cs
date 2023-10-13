@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TetrisTemplate
@@ -8,6 +8,8 @@ namespace TetrisTemplate
     {
         Texture2D texture;
         TetrisGrid grid;
+
+        SoundEffect placeSound;
 
         //represents the position within the grid
         protected Point position;
@@ -22,6 +24,7 @@ namespace TetrisTemplate
 
         protected Block(TetrisGrid grid)
         {
+            placeSound = TetrisGame.ContentManager.Load<SoundEffect>("placeBlockSound");
             texture = TetrisGame.ContentManager.Load<Texture2D>("block");
             this.grid = grid;
         }
@@ -65,6 +68,8 @@ namespace TetrisTemplate
                 TetrisGame.GameWorld.GameOver();
                 return;
             }
+
+            placeSound.Play();
 
             // Check if any of the lines got full
             int[] yCoordinates = new int[Size];

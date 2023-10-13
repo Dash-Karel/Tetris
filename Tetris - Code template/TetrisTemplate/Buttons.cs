@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -14,6 +16,7 @@ internal class Button
     Texture2D buttonTexture;
     Rectangle mouseDetector;
     SpriteFont standardFont;
+    SoundEffect clickSound;
     protected Color color;
     float colorHoverdFactor;
 
@@ -26,6 +29,8 @@ internal class Button
         standardFont = _standardFont;
         color = _color;
         size = _size;
+
+        clickSound = TetrisGame.ContentManager.Load<SoundEffect>("buttonClickSound");
 
         topLeftPosition = _topLeftPoint;
         mouseDetector = new Rectangle(_topLeftPoint.ToPoint(), _size.ToPoint());
@@ -41,11 +46,13 @@ internal class Button
         if (mouseDetector.Contains(mouse.Position))
         {
             Hovered();
-                
-            //Check if the left button is being clicked and making sure that the button does not switch when the left button is held.
-            if (mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton != ButtonState.Pressed)
-                Pressed();
 
+            //Check if the left mouse button is being clicked and making sure that the button does not switch when the left button is held.
+            if (mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton != ButtonState.Pressed)
+            {
+                Pressed();
+                clickSound.Play();
+            }
         }
         else
         {
@@ -81,6 +88,7 @@ internal class Button
     protected virtual void Pressed()
     {
         //Call the event button pressed.
+
         buttonPressed?.Invoke();
     }
 }
