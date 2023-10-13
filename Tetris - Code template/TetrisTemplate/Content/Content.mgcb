@@ -37,10 +37,40 @@
 /processorParam:TextureFormat=Color
 /build:Button.png
 
+#begin buttonClickSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:buttonClickSound.wav
+
+#begin gameOverSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:gameOverSound.wav
+
+#begin lineClearSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:lineClearSound.wav
+
+#begin placeBlockSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:placeBlockSound.wav
+
 #begin SpelFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:SpelFont.spritefont
+
+#begin TetrisTheme.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:TetrisTheme.mp3
 

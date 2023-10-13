@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 /// <summary>
@@ -31,6 +32,8 @@ class TetrisGrid
     //array representing the grid
     CellType[,] grid;
 
+    SoundEffect lineClearSound;
+
     public CellType[,] Grid { get { return grid; } }
 
     public Color[] CellColors { get { return cellColors; } }
@@ -48,6 +51,7 @@ class TetrisGrid
     public TetrisGrid()
     {
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
+        lineClearSound = TetrisGame.ContentManager.Load<SoundEffect>("lineClearSound");
         position = new Vector2(TetrisGame.ScreenSize.X, TetrisGame.ScreenSize.Y) / 2;
         origin = new Vector2(Width * emptyCell.Width, Height * emptyCell.Height) / 2;
         Clear();
@@ -92,7 +96,7 @@ class TetrisGrid
         foreach (int yCoordinate in yCoordinates)
         {
             if (yCoordinate >= Height || yCoordinate < 0)
-                return;
+                continue;
 
             bool lineFull = true;
             for (int x = 0; x < Width; x++)
@@ -110,8 +114,11 @@ class TetrisGrid
                 LinesCleared++;
             }
         }
-        if(LinesCleared > 0)
+        if (LinesCleared > 0)
+        {
             TetrisGame.GameWorld.IncreaseScore(LinesCleared);
+            lineClearSound.Play();
+        }
     }
     void DeleteLine(int yCoordinate)
     {

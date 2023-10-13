@@ -46,6 +46,8 @@ class TetrisGame : Game
 
         // create the input helper object
         inputHelper = new InputHelper();
+
+
     }
 
     protected override void LoadContent()

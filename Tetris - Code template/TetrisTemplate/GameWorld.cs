@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using TetrisTemplate;
 
@@ -47,17 +49,27 @@ class GameWorld
 
     GameOverScreen gameOverScreen;
 
+    Song themeSong;
+    SoundEffect gameOverSound;
+
     float secondsUntilNextTick;
     float secondsPerTick = 1;
 
     int score;
     int level;
 
+    double leftHeldForSeconds;
+    double rightHeldForSeconds;
+    double downHeldForSeconds;
 
     public GameWorld()
     {
         random = new Random();
         gameState = GameState.Playing;
+
+        themeSong = TetrisGame.ContentManager.Load<Song>("TetrisTheme");
+        gameOverSound = TetrisGame.ContentManager.Load<SoundEffect>("gameOverSound");
+        MediaPlayer.IsRepeating = true;
 
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
 
@@ -79,32 +91,76 @@ class GameWorld
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
-        if(inputHelper.KeyPressed(Keys.D))
-            block.RotateRight();
+        //updating timers for auto repeat
 
-        if(inputHelper.KeyPressed(Keys.A))
-            block.RotateLeft();
+        double elapsedSeconds = gameTime.ElapsedGameTime.TotalSeconds;
+        if (inputHelper.KeyDown(Keys.Left))
+            leftHeldForSeconds += elapsedSeconds;
+        else
+            leftHeldForSeconds = 0f;
 
-        if(inputHelper.KeyPressed(Keys.Left))
+        if (inputHelper.KeyDown(Keys.Right))
+            rightHeldForSeconds += elapsedSeconds;
+        else
+            rightHeldForSeconds = 0f;
+
+        //updating timer for soft dropping
+        if(inputHelper.KeyDown(Keys.Down))
+        {
+            downHeldForSeconds += elapsedSeconds;
+        }
+        else
+        {
+            downHeldForSeconds = 0f;
+        }
+
+        //auto repeat: moving the blocks if a direction key is held for more than 0.3s and the other direction key is not pressed. It repeats every 0.625 seconds
+        if (leftHeldForSeconds > 0.3f && rightHeldForSeconds == 0f)
+        {
+            leftHeldForSeconds = 0.2375f;
             block.MoveLeft();
-
-        if(inputHelper.KeyPressed(Keys.Right))
+        }
+        else if (rightHeldForSeconds > 0.3f && leftHeldForSeconds == 0f)
+        {
+            rightHeldForSeconds = 0.2375f;
             block.MoveRight();
+        }
+        else
+        {
+            //code for regular horizontal movement, only if auto repeat is not occuring
+            if (inputHelper.KeyPressed(Keys.Left))
+                block.MoveLeft();
 
-        if (inputHelper.KeyPressed(Keys.Down))
+            if (inputHelper.KeyPressed(Keys.Right))
+                block.MoveRight();
+        }
+
+        //code for soft dropping
+        if (downHeldForSeconds > secondsPerTick/10)
         {
             block.MoveDown();
         }
 
+        //code for hard dropping
         if (inputHelper.KeyPressed(Keys.Space))
-        {
             block.HardDrop();
-        }
+
+        if (inputHelper.KeyPressed(Keys.D))
+            block.RotateRight();
+
+        if (inputHelper.KeyPressed(Keys.A))
+            block.RotateLeft();
     }
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        if(gameState == GameState.Playing)
+        //ensure music keeps playing
+        if (MediaPlayer.State == MediaState.Stopped)
+            MediaPlayer.Play(themeSong);
+        if (MediaPlayer.State == MediaState.Paused)
+            MediaPlayer.Resume();
+
+        if (gameState == GameState.Playing)
         {
             UpdateTickTime(gameTime);
             HandleInput(gameTime, inputHelper);
@@ -132,6 +188,7 @@ class GameWorld
 
     public void GameOver()
     {
+        gameOverSound.Play();
         gameState = GameState.GameOver;
     }
 
