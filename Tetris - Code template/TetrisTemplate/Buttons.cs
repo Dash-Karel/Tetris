@@ -46,11 +46,13 @@ internal class Button
         if (mouseDetector.Contains(mouse.Position))
         {
             Hovered();
-                
-            //Check if the left button is being clicked and making sure that the button does not switch when the left button is held.
-            if (mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton != ButtonState.Pressed)
-                Pressed();
 
+            //Check if the left mouse button is being clicked and making sure that the button does not switch when the left button is held.
+            if (mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton != ButtonState.Pressed)
+            {
+                Pressed();
+                clickSound.Play();
+            }
         }
         else
         {

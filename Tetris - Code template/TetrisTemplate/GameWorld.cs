@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using System;
 using TetrisTemplate;
 
@@ -40,6 +39,9 @@ class GameWorld
     /// <summary>
     /// The main grid of the game.
     /// </summary>
+    /// 
+    TetrisGame game;
+
     TetrisGrid grid;
 
     Block block;
@@ -49,7 +51,9 @@ class GameWorld
 
     GameOverScreen gameOverScreen;
 
-    Song themeSong;
+    MediaPlayer mediaPlayer;
+
+    SoundEffect themeSong, shittySong;
     SoundEffect gameOverSound;
 
     float secondsUntilNextTick;
@@ -62,14 +66,21 @@ class GameWorld
     double rightHeldForSeconds;
     double downHeldForSeconds;
 
-    public GameWorld()
+    public GameWorld(TetrisGame tetrisGame)
     {
+        game = tetrisGame;
+
+        mediaPlayer = new MediaPlayer();
+
         random = new Random();
         gameState = GameState.Playing;
 
-        themeSong = TetrisGame.ContentManager.Load<Song>("TetrisTheme");
+        themeSong = TetrisGame.ContentManager.Load<SoundEffect>("TetrisTheme");
+        shittySong = TetrisGame.ContentManager.Load<SoundEffect>("shittyMusic");
+        mediaPlayer.AddSongToQueue(themeSong);
+        mediaPlayer.AddSongToQueue(shittySong);
+
         gameOverSound = TetrisGame.ContentManager.Load<SoundEffect>("gameOverSound");
-        MediaPlayer.IsRepeating = true;
 
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
 
@@ -91,9 +102,10 @@ class GameWorld
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
-        //updating timers for auto repeat
-
+        //helper variable for timers
         double elapsedSeconds = gameTime.ElapsedGameTime.TotalSeconds;
+
+        //updating timers for auto repeat
         if (inputHelper.KeyDown(Keys.Left))
             leftHeldForSeconds += elapsedSeconds;
         else
@@ -114,33 +126,33 @@ class GameWorld
             downHeldForSeconds = 0f;
         }
 
-        //auto repeat: moving the blocks if a direction key is held for more than 0.3s and the other direction key is not pressed. It repeats every 0.625 seconds
+        //auto repeat: moving the blocks if a direction key is held for more than 0.3s and the other direction key is not pressed. It repeats every 0.05 seconds
         if (leftHeldForSeconds > 0.3f && rightHeldForSeconds == 0f)
         {
-            leftHeldForSeconds = 0.2375f;
+            leftHeldForSeconds = 0.25f;
             block.MoveLeft();
         }
         else if (rightHeldForSeconds > 0.3f && leftHeldForSeconds == 0f)
         {
-            rightHeldForSeconds = 0.2375f;
+            rightHeldForSeconds = 0.25f;
             block.MoveRight();
         }
-        else
-        {
-            //code for regular horizontal movement, only if auto repeat is not occuring
-            if (inputHelper.KeyPressed(Keys.Left))
-                block.MoveLeft();
 
-            if (inputHelper.KeyPressed(Keys.Right))
-                block.MoveRight();
-        }
+        //code for regular horizontal movement, only if auto repeat is not occuring
+        if (inputHelper.KeyPressed(Keys.Left) && rightHeldForSeconds == 0f)
+            block.MoveLeft();
+
+        if (inputHelper.KeyPressed(Keys.Right) && leftHeldForSeconds == 0f)
+            block.MoveRight();
 
         //code for soft dropping
-        if (downHeldForSeconds > secondsPerTick/10)
+        if (inputHelper.KeyPressed(Keys.Down))
+            block.MoveDown();
+        if (downHeldForSeconds > secondsPerTick / 20)
         {
             block.MoveDown();
+            downHeldForSeconds = 0f;
         }
-
         //code for hard dropping
         if (inputHelper.KeyPressed(Keys.Space))
             block.HardDrop();
@@ -154,11 +166,7 @@ class GameWorld
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        //ensure music keeps playing
-        if (MediaPlayer.State == MediaState.Stopped)
-            MediaPlayer.Play(themeSong);
-        if (MediaPlayer.State == MediaState.Paused)
-            MediaPlayer.Resume();
+        mediaPlayer.Update();
 
         if (gameState == GameState.Playing)
         {
@@ -189,12 +197,14 @@ class GameWorld
     public void GameOver()
     {
         gameOverSound.Play();
+        game.IsMouseVisible = true;
         gameState = GameState.GameOver;
     }
 
     public void Reset()
     {
         gameState = GameState.Playing;
+        game.IsMouseVisible= false;
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
