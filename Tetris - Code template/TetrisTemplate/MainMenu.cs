@@ -26,10 +26,10 @@ namespace TetrisTemplate
             buttonSize = new Vector2(buttonTexture.Width, buttonTexture.Height);
 
             //Button positions
-            normalPos = new Vector2(TetrisGame.ScreenSize.X / 3, TetrisGame.ScreenSize.Y / 5 * 2) - buttonSize / 2;
-            monkeyPos = new Vector2(TetrisGame.ScreenSize.X / 3 * 2, TetrisGame.ScreenSize.Y / 5 * 2) - buttonSize / 2;
+            normalPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            monkeyPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
             
-            gameTitelPos = new Vector2(TetrisGame.ScreenSize.X / 2, TetrisGame.ScreenSize.Y / 5) - standardFont.MeasureString(gameTitelTex) / 2;
+            gameTitelPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameTitelTex) / 2;
 
             //Button text's
             normalTex = "Play  Normal";
@@ -42,11 +42,11 @@ namespace TetrisTemplate
             normalBut.buttonPressed += NormalPressed;
             monkeyBut.buttonPressed += MonkeyPressed;
         }
-        public void Update()
+        public void Update(InputHelper inputHelper)
         {
             //Updating the buttons
-            normalBut.Update();
-            monkeyBut.Update();
+            normalBut.Update(inputHelper);
+            monkeyBut.Update(inputHelper);
         }
         public void Draw(SpriteBatch _spriteBatch)
         {

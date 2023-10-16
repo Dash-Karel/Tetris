@@ -10,6 +10,13 @@ class InputHelper
     MouseState currentMouseState, previousMouseState;
     KeyboardState currentKeyboardState, previousKeyboardState;
 
+    TetrisGame game;
+
+    public InputHelper(TetrisGame game)
+    {
+        this.game = game;
+    }
+
     /// <summary>
     /// Updates the InputHelper object by retrieving the new mouse/keyboard state, and keeping the previous state as a back-up.
     /// </summary>
@@ -28,7 +35,7 @@ class InputHelper
     /// </summary>
     public Vector2 MousePosition
     {
-        get { return new Vector2(currentMouseState.X, currentMouseState.Y); }
+        get { return game.ScreenToWorld(new Vector2(currentMouseState.X, currentMouseState.Y)); }
     }
 
     /// <summary>

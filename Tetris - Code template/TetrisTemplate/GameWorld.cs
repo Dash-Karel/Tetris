@@ -3,11 +3,12 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
 using TetrisTemplate;
 
 /// <summary>
 /// A class for representing the game world.
-/// This contains the grid, the falling block, and everything else that the player can see/do.
+/// This contains the gridPlayer1, the falling block, and everything else that the player can see/do.
 /// </summary>
 class GameWorld
 {
@@ -36,14 +37,16 @@ class GameWorld
     /// The current game state.
     /// </summary>
     GameState gameState;
+    GameState lastGameState;
 
     /// <summary>
-    /// The main grid of the game.
+    /// The main gridPlayer1 of the game.
     /// </summary>
     /// 
     TetrisGame game;
 
-    TetrisGrid grid;
+    TetrisGrid gridPlayer1;
+    TetrisGrid gridPlayer2;
 
     Block block;
     Block previewBlock;
@@ -58,6 +61,8 @@ class GameWorld
     SoundEffect themeSong, shittySong;
     SoundEffect gameOverSound;
 
+    Texture2D background1, background2;
+
     float secondsUntilNextTick;
     float secondsPerTick = 1;
 
@@ -67,6 +72,8 @@ class GameWorld
     double leftHeldForSeconds;
     double rightHeldForSeconds;
     double downHeldForSeconds;
+
+    bool is2Player;
 
     public GameWorld(TetrisGame tetrisGame)
     {
@@ -86,7 +93,10 @@ class GameWorld
 
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
 
-        grid = new TetrisGrid();
+        background1 = TetrisGame.ContentManager.Load<Texture2D>("background");
+
+        gridPlayer1 = new TetrisGrid();
+        gridPlayer2 = new TetrisGrid();
 
         bag = new RandomBag();
 
@@ -99,8 +109,16 @@ class GameWorld
         score = 0;
         level = 1;
 
-        previewBlock = bag.NextBlock(grid);
+        previewBlock = bag.NextBlock(gridPlayer1);
         NewBlocks();
+    }
+
+    void Switch2PlayerMode()
+    {
+        is2Player = !is2Player;
+
+        gridPlayer1.OffsetGrid(new Vector2(-TetrisGame.WorldSize.X / 4, 0));
+        gridPlayer2.OffsetGrid(new Vector2(TetrisGame.WorldSize.X / 4, 0));
     }
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
@@ -174,21 +192,26 @@ class GameWorld
         switch (gameState)
         {
             case GameState.MainMenu:
-                mainMenu.Update();
+                lastGameState = gameState;
+                mainMenu.Update(inputHelper);
                 break;
             case GameState.Playing:
+                if (gameState != lastGameState)
+                    Reset();
                 UpdateTickTime(gameTime);
                 HandleInput(gameTime, inputHelper);
+                lastGameState = gameState;
                 break;
             case GameState.GameOver:
-                gameOverScreen.Update();
+                lastGameState = gameState;
+                gameOverScreen.Update(inputHelper);
                 break;
         }
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Matrix spriteScale)
     {
-        spriteBatch.Begin();
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
         switch (gameState)
         {   
             case GameState.MainMenu:
@@ -202,8 +225,7 @@ class GameWorld
                 DrawPlaying(gameTime, spriteBatch);
                 gameOverScreen.Draw(spriteBatch);
                 break;      
-        }
-        
+        }  
         spriteBatch.End();
     }
 
@@ -225,9 +247,9 @@ class GameWorld
         score = 0;
         level = 1;
 
-        grid.Clear();
+        gridPlayer1.Clear();
 
-        previewBlock = bag.NextBlock(grid);
+        previewBlock = bag.NextBlock(gridPlayer1);
         NewBlocks();
     }
     public void NewBlocks()
@@ -235,7 +257,7 @@ class GameWorld
         secondsUntilNextTick = secondsPerTick;
         block = previewBlock;
         block.MoveToSpawnPosition();
-        previewBlock = bag.NextBlock(grid);
+        previewBlock = bag.NextBlock(gridPlayer1);
     }
     public void IncreaseScore(int LinesCleared)
     {
@@ -277,11 +299,13 @@ class GameWorld
 
     void DrawPlaying(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        grid.Draw(gameTime, spriteBatch);
+        spriteBatch.Draw(background1, Vector2.Zero, Color.White);
+        gridPlayer1.Draw(gameTime, spriteBatch);
         block.Draw(spriteBatch);
         previewBlock.Draw(spriteBatch);
-        spriteBatch.DrawString(font, "Level: " + level.ToString(), Vector2.Zero, Color.White);
-        spriteBatch.DrawString(font, "Score: " + score.ToString(), new Vector2(0, font.LineSpacing), Color.White);
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(171 - font.MeasureString(level.ToString()).X / 2, 22), Color.Yellow);
+        spriteBatch.DrawString(font, score.ToString(), new Vector2(628 - font.MeasureString(score.ToString()).X / 2, 22), Color.Yellow);
+        Debug.WriteLine(new Vector2(0, font.LineSpacing + font.MeasureString("Score: ").Y) + font.MeasureString("Level " + 1022940));
     }
 
     public void StartNormalGame()

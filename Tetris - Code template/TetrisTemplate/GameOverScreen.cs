@@ -25,10 +25,10 @@ namespace TetrisTemplate
             buttonSize = new Vector2(buttonTexture.Width, buttonTexture.Height);
 
             //Button positions
-            mainMenuPos = new Vector2(TetrisGame.ScreenSize.X / 3, TetrisGame.ScreenSize.Y / 5 * 2) - buttonSize / 2;
-            replayPos = new Vector2(TetrisGame.ScreenSize.X / 3 * 2, TetrisGame.ScreenSize.Y / 5 * 2) - buttonSize / 2;
+            mainMenuPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            replayPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
             //
-            gameOverPos = new Vector2(TetrisGame.ScreenSize.X / 2, TetrisGame.ScreenSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
+            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
 
             //Button text's
             mainMenuText = "Main menu";
@@ -42,11 +42,11 @@ namespace TetrisTemplate
             replayBut.buttonPressed += ReplayPressed;
             mainMenuBut.buttonPressed += MainMenuPressed;
         }
-        public void Update()
+        public void Update(InputHelper inputHelper)
         {
             //Updating the buttons
-            mainMenuBut.Update();
-            replayBut.Update();
+            mainMenuBut.Update(inputHelper);
+            replayBut.Update(inputHelper);
         }
         public void Draw(SpriteBatch _spriteBatch)
         {

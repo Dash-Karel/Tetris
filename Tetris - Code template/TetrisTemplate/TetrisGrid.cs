@@ -27,7 +27,7 @@ class TetrisGrid
     Vector2 position, origin;
 
     //array for mapping colours to a value
-    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.CornflowerBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
 
     //array representing the grid
     CellType[,] grid;
@@ -52,7 +52,7 @@ class TetrisGrid
     {
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         lineClearSound = TetrisGame.ContentManager.Load<SoundEffect>("lineClearSound");
-        position = new Vector2(TetrisGame.ScreenSize.X, TetrisGame.ScreenSize.Y) / 2;
+        position = new Vector2(TetrisGame.WorldSize.X, TetrisGame.WorldSize.Y) / 2;
         origin = new Vector2(Width * emptyCell.Width, Height * emptyCell.Height) / 2;
         Clear();
     }
@@ -137,6 +137,10 @@ class TetrisGrid
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------
 
+    public void OffsetGrid(Vector2 offset)
+    {
+        position += offset;
+    }
     public Point GetCellAtPosition(Vector2 worldPosition)
     {
         Vector2 offset = worldPosition - position - origin;

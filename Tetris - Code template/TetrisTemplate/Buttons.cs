@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.ComponentModel.Design;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,6 @@ internal class Button
 {
     public event Notify buttonPressed;
 
-    MouseState mouse, previousMouse;
     Vector2 topLeftPosition, textPosition, size;
     string buttonText;
     Texture2D buttonTexture;
@@ -38,17 +38,14 @@ internal class Button
         textPosition = mouseDetector.Center.ToVector2() - standardFont.MeasureString(buttonText) / 2; 
         colorHoverdFactor = 0.5f;
     }
-    public void Update()
+    public void Update(InputHelper inputHelper)
     {
         //Detecting if the mouse is with in the button and if its pressed.
-        previousMouse = mouse;
-        mouse = Mouse.GetState();
-        if (mouseDetector.Contains(mouse.Position))
+        if (mouseDetector.Contains(inputHelper.MousePosition))
         {
             Hovered();
 
-            //Check if the left mouse button is being clicked and making sure that the button does not switch when the left button is held.
-            if (mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton != ButtonState.Pressed)
+            if (inputHelper.MouseLeftButtonPressed())
             {
                 Pressed();
                 clickSound.Play();
