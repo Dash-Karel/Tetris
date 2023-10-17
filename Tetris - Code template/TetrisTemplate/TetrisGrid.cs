@@ -34,6 +34,8 @@ class TetrisGrid
 
     SoundEffect lineClearSound;
 
+    GameWorld gameWorld;
+
     public CellType[,] Grid { get { return grid; } }
 
     public Color[] CellColors { get { return cellColors; } }
@@ -48,12 +50,13 @@ class TetrisGrid
     /// Creates a new TetrisGrid.
     /// </summary>
     /// <param name="b"></param>
-    public TetrisGrid()
+    public TetrisGrid(GameWorld gameWorld)
     {
+        this.gameWorld = gameWorld;
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         lineClearSound = TetrisGame.ContentManager.Load<SoundEffect>("lineClearSound");
-        position = new Vector2(TetrisGame.WorldSize.X, TetrisGame.WorldSize.Y) / 2;
         origin = new Vector2(Width * emptyCell.Width, Height * emptyCell.Height) / 2;
+        ApplyResolutionSettings();
         Clear();
     }
 
@@ -62,13 +65,13 @@ class TetrisGrid
     /// </summary>
     /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
     /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Vector2 worldOffset)
     {
         for (int width = 0; width < Width; width++)
         {
             for (int height = 0; height < Height; height++)
             {
-                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), cellColors[(int)grid[width, height]]);
+                spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height) + worldOffset, cellColors[(int)grid[width, height]]);
             }
         }
     }
@@ -116,7 +119,7 @@ class TetrisGrid
         }
         if (LinesCleared > 0)
         {
-            TetrisGame.GameWorld.IncreaseScore(LinesCleared);
+            gameWorld.IncreaseScore(LinesCleared);
             lineClearSound.Play();
         }
     }
@@ -134,6 +137,15 @@ class TetrisGrid
             for (int y = startingYCoordinate; y > 0; y--)
                 grid[x,y] = grid[x,y - 1];
     }
+    public void MoveAllLinesUp()
+    {
+        for (int x = 0; x < Width; x++)
+            for (int y = 1; y < Height; y++)
+            {
+                grid[x, y - 1] = grid[x, y];
+                grid[x, y] = CellType.empty;
+            }
+    }
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------
 
@@ -141,6 +153,13 @@ class TetrisGrid
     {
         position += offset;
     }
+
+    public void ApplyResolutionSettings()
+    {
+        position = new Vector2(TetrisGame.WorldSize.X, TetrisGame.WorldSize.Y) / 2;
+    }
+
+    /*
     public Point GetCellAtPosition(Vector2 worldPosition)
     {
         Vector2 offset = worldPosition - position - origin;
@@ -148,6 +167,7 @@ class TetrisGrid
         int y = (int)offset.Y / emptyCell.Height;
         return new Point(x, y);
     }
+    */
     public Vector2 GetPositionOfCell(Point cell)
     {
         return position - origin + new Vector2(cell.X * emptyCell.Width, cell.Y * emptyCell.Height);

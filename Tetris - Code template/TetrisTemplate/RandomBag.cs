@@ -5,14 +5,17 @@ namespace TetrisTemplate
 {
     internal class RandomBag
     {
+        GameWorld gameWorld;
+
         byte bagPointer;
 
         byte[] bag;
 
         List<byte> choicePool;
 
-        public RandomBag()
+        public RandomBag(GameWorld gameWorld)
         {
+            this.gameWorld = gameWorld;
             bag = new byte[7];
             choicePool = new List<byte>(7);
             Refill();
@@ -27,19 +30,19 @@ namespace TetrisTemplate
             switch(bag[bagPointer++])
             {
                 case 0:
-                    return new OBlock(grid);
+                    return new OBlock(grid, gameWorld);
                 case 1:
-                    return new IBlock(grid);
+                    return new IBlock(grid, gameWorld);
                 case 2:
-                    return new TBlock(grid);
+                    return new TBlock(grid, gameWorld);
                 case 3:
-                    return new LBlock(grid);
+                    return new LBlock(grid, gameWorld);
                 case 4:
-                    return new JBlock(grid);
+                    return new JBlock(grid, gameWorld);
                 case 5:
-                    return new SBlock(grid);
+                    return new SBlock(grid, gameWorld);
                 case 6:
-                    return new ZBlock(grid);
+                    return new ZBlock(grid, gameWorld);
                 default:
                     return null;
             }

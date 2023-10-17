@@ -6,6 +6,7 @@ internal class Block
 {
     Texture2D texture;
     TetrisGrid grid;
+    GameWorld gameWorld;
 
     SoundEffect placeSound;
 
@@ -22,8 +23,9 @@ internal class Block
         get { return shape.GetLength(0); }
     }
 
-    protected Block(TetrisGrid grid)
+    protected Block(TetrisGrid grid, GameWorld gameWorld)
     {
+        this.gameWorld = gameWorld;
         placeSound = TetrisGame.ContentManager.Load<SoundEffect>("placeBlockSound");
         texture = TetrisGame.ContentManager.Load<Texture2D>("block");
         this.grid = grid;
@@ -31,14 +33,14 @@ internal class Block
         //ensures sprite is drawn in the next box
         offset = new Vector2(228, 186);
     }
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch, Vector2 worldOffset)
     {
         for (int width = 0; width < Size; width++)
         {
             for (int height = 0; height < Size; height++)
             {
                 if (shape[width, height] == true)
-                    spriteBatch.Draw(texture, grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height) - offset, grid.CellColors[(int)color]);
+                    spriteBatch.Draw(texture, grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height) - offset + worldOffset, grid.CellColors[(int)color]);
             }
         }
     }
@@ -68,7 +70,7 @@ internal class Block
         //If the bottom of the block lies outside the grid when placing it the game is over
         if (position.Y + bottomOfBlockCoordinate < 0)
         {
-            TetrisGame.GameWorld.GameOver();
+            gameWorld.GameOver();
             return;
         }
 
@@ -129,6 +131,11 @@ internal class Block
         if (!MoveWasValid())
             position.X--;
     }
+    public void MoveUp() 
+    {
+        //only called when everything moves up so no extra checks needed
+        position.Y--;
+    }
     public bool MoveDown()
     {
         //moves the block down once if possible and returns false when the block is placed as the block didn't move
@@ -137,7 +144,7 @@ internal class Block
         {
             position.Y--;
             PlaceBlock();
-            TetrisGame.GameWorld.NewBlocks();
+            gameWorld.NewBlocks();
             return false;
         }
         return true;
@@ -154,7 +161,7 @@ internal class Block
 }
 internal class OBlock : Block
 {
-    public OBlock(TetrisGrid grid) : base(grid)
+    public OBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { true, true }, { true, true } };
         color = TetrisGrid.CellType.yellow;
@@ -165,7 +172,7 @@ internal class OBlock : Block
 }
 internal class IBlock : Block
 {
-    public IBlock(TetrisGrid grid) : base(grid)
+    public IBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { false, true, false, false }, { false, true, false, false }, { false, true, false, false }, { false, true, false, false } };
         color = TetrisGrid.CellType.lightBlue;
@@ -176,7 +183,7 @@ internal class IBlock : Block
 }
 internal class TBlock : Block
 {
-    public TBlock(TetrisGrid grid) : base(grid)
+    public TBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { false, true, false }, { true, true, false }, { false, true, false } };
         color = TetrisGrid.CellType.purple;
@@ -187,7 +194,7 @@ internal class TBlock : Block
 }
 internal class LBlock : Block
 {
-    public LBlock(TetrisGrid grid) : base(grid)
+    public LBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { false, true, false }, { false, true, false }, { true, true, false } };
         color = TetrisGrid.CellType.orange;
@@ -198,7 +205,7 @@ internal class LBlock : Block
 }
 internal class JBlock : Block
 {
-    public JBlock(TetrisGrid grid) : base(grid)
+    public JBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { true, true, false }, { false, true, false }, { false, true, false } };
         color = TetrisGrid.CellType.darkBlue;
@@ -209,7 +216,7 @@ internal class JBlock : Block
 }
 internal class SBlock : Block
 {
-    public SBlock(TetrisGrid grid) : base(grid)
+    public SBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { false, true, false }, { true, true, false }, { true, false, false } };
         color = TetrisGrid.CellType.green;
@@ -220,7 +227,7 @@ internal class SBlock : Block
 }
 internal class ZBlock : Block
 {
-    public ZBlock(TetrisGrid grid) : base(grid)
+    public ZBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
     {
         shape = new bool[,] { { true, false, false }, { true, true, false }, { false, true, false } };
         color = TetrisGrid.CellType.red;

@@ -6,33 +6,38 @@ namespace TetrisTemplate
 {
     internal class GameOverScreen
     {
-        Texture2D buttonTexture;
+        TetrisGame game;
+
+        Texture2D buttonTexture, darkeningLayer;
         SpriteFont standardFont;
 
         Vector2 mainMenuPos, replayPos, gameOverPos;
         Vector2 buttonSize;
         Button mainMenuBut, replayBut;
-        string gameOverText;
+        string gameOverText, standardGameOverText;
         string mainMenuText, replayText;
-        public GameOverScreen(SpriteFont _standardFont) 
+        public GameOverScreen(SpriteFont _standardFont, TetrisGame game) 
         {
+            this.game = game;
+
             standardFont = _standardFont;
             buttonTexture = TetrisGame.ContentManager.Load<Texture2D>("Button");
-            gameOverText = "Game over";
+            darkeningLayer = TetrisGame.ContentManager.Load<Texture2D>("blankBackground");
+            standardGameOverText = "GAMEOVER";
+            gameOverText = standardGameOverText;
 
             //Calculating and setting button parameters
             //The position of the ui elements are based on fractions of the total screen lenght and screen height
             buttonSize = new Vector2(buttonTexture.Width, buttonTexture.Height);
 
-            //Button positions
-            mainMenuPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
-            replayPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
-            //
-            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
-
             //Button text's
             mainMenuText = "Main menu";
             replayText = "Play again";
+
+            //Button positions
+            mainMenuPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            replayPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
 
             //Initializing Buttons
             mainMenuBut = new Button(mainMenuPos, buttonSize, mainMenuText, buttonTexture, standardFont, Color.Green);
@@ -51,17 +56,42 @@ namespace TetrisTemplate
         public void Draw(SpriteBatch _spriteBatch)
         {
             //Drawing the Text and Buttons
-            _spriteBatch.DrawString(standardFont, gameOverText, gameOverPos, Color.Blue);
+            _spriteBatch.Draw(darkeningLayer, Vector2.Zero, Color.Black * 0.7f);
+            _spriteBatch.DrawString(standardFont, gameOverText, gameOverPos, Color.White);
             mainMenuBut.Draw(_spriteBatch);
             replayBut.Draw(_spriteBatch);
         }
+        public void ApplyResolutionSettings()
+        {
+            //Button positions
+            mainMenuPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            replayPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
+
+            mainMenuBut.UpdatePosition(mainMenuPos);
+            replayBut.UpdatePosition(replayPos);
+        }
+        public void ChangeGameOverText(string Text)
+        {
+            gameOverText = Text;
+            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
+        }
+
+        void Reset()
+        {
+            gameOverText = standardGameOverText;
+            gameOverPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameOverText) / 2;
+        }
+
         void ReplayPressed()
         {
-            TetrisGame.GameWorld.Reset();
+            game.Reset();
+            Reset();
         }
         void MainMenuPressed()
         {
-            TetrisGame.GameWorld.ReturnToMainMenu();
+            game.ReturnToMainMenu();
+            Reset();
         }
     }
 }

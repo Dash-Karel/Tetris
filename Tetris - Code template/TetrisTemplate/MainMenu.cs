@@ -8,60 +8,76 @@ namespace TetrisTemplate
 
     internal class MainMenu
     {
+        TetrisGame game;
+
         Texture2D buttonTexture;
         SpriteFont standardFont;
 
-        string normalTex, monkeyTex, gameTitelTex;
+        string normalText, twoPlayerText, gameTitelText, infoText;
         Vector2 buttonSize;
-        Vector2 normalPos, monkeyPos, gameTitelPos;
-        Button normalBut, monkeyBut;
-        public MainMenu(SpriteFont _standardFont) 
-        { 
+        Vector2 normalPos, twoPlayerPos, gameTitelPos, infoPos;
+        Button normalBut, twoPlayerBut;
+        public MainMenu(SpriteFont _standardFont, TetrisGame game) 
+        {
+            this.game = game;
+
             standardFont = _standardFont;
             buttonTexture = TetrisGame.ContentManager.Load<Texture2D>("Button");
-            gameTitelTex = "MONKEY  TETRIS";
+            gameTitelText = "TETRIS";
 
             //Calculating and setting button parameters
             //The position of the ui elements are based on fractions of the total screen lenght and screen height
             buttonSize = new Vector2(buttonTexture.Width, buttonTexture.Height);
 
+            //Button text's
+            normalText = "Normal";
+            twoPlayerText = "Two Players";
+            infoText = "Press F5 to toggle fullscreen";
+
             //Button positions
             normalPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
-            monkeyPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
-            
-            gameTitelPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameTitelTex) / 2;
-
-            //Button text's
-            normalTex = "Play  Normal";
-            monkeyTex = "Play  Monkey  Mode";
+            twoPlayerPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            gameTitelPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameTitelText) / 2;
+            infoPos = Vector2.Zero;
 
             //Initializing Buttons
-            normalBut = new Button(normalPos, buttonSize, normalTex, buttonTexture, standardFont, Color.Green);
-            monkeyBut = new Button(monkeyPos, buttonSize, monkeyTex, buttonTexture, standardFont, Color.Green);
+            normalBut = new Button(normalPos, buttonSize, normalText, buttonTexture, standardFont, Color.Green);
+            twoPlayerBut = new Button(twoPlayerPos, buttonSize, twoPlayerText, buttonTexture, standardFont, Color.Green);
 
             normalBut.buttonPressed += NormalPressed;
-            monkeyBut.buttonPressed += MonkeyPressed;
+            twoPlayerBut.buttonPressed += TwoPlayerPressed;
         }
         public void Update(InputHelper inputHelper)
         {
             //Updating the buttons
             normalBut.Update(inputHelper);
-            monkeyBut.Update(inputHelper);
+            twoPlayerBut.Update(inputHelper);
         }
         public void Draw(SpriteBatch _spriteBatch)
         {
             //Drawing the Text and Buttons
-            _spriteBatch.DrawString(standardFont, gameTitelTex, gameTitelPos, Color.Blue);
+            _spriteBatch.DrawString(standardFont, gameTitelText, gameTitelPos, Color.Blue);
+            _spriteBatch.DrawString(standardFont, infoText, infoPos, Color.Gray);
             normalBut.Draw(_spriteBatch);
-            monkeyBut.Draw(_spriteBatch);
+            twoPlayerBut.Draw(_spriteBatch);
         }
-        void MonkeyPressed()
+        public void ApplyResolutionSettings()
         {
+            //Button positions
+            normalPos = new Vector2(TetrisGame.WorldSize.X / 3, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            twoPlayerPos = new Vector2(TetrisGame.WorldSize.X / 3 * 2, TetrisGame.WorldSize.Y / 5 * 2) - buttonSize / 2;
+            gameTitelPos = new Vector2(TetrisGame.WorldSize.X / 2, TetrisGame.WorldSize.Y / 5) - standardFont.MeasureString(gameTitelText) / 2;
 
+            normalBut.UpdatePosition(normalPos);
+            twoPlayerBut.UpdatePosition(twoPlayerPos);
+        }
+        void TwoPlayerPressed()
+        {
+            game.StartTwoPlayerGame();
         }
         void NormalPressed()
         {
-            TetrisGame.GameWorld.StartNormalGame();
+            game.StartNormalGame();
         }
     }
 }

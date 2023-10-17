@@ -3,25 +3,14 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Diagnostics;
 using TetrisTemplate;
 
 /// <summary>
 /// A class for representing the game world.
-/// This contains the gridPlayer1, the falling block, and everything else that the player can see/do.
+/// This contains the grid, the falling block, and everything else that the player can see/do.
 /// </summary>
 class GameWorld
 {
-    /// <summary>
-    /// An enum for the different game states that the game can have.
-    /// </summary>
-    enum GameState
-    {
-        Playing,
-        GameOver,
-        MainMenu
-    }
-
     /// <summary>
     /// The random-number generator of the game.
     /// </summary>
@@ -34,74 +23,55 @@ class GameWorld
     SpriteFont font;
 
     /// <summary>
-    /// The current game state.
+    /// The main grid of the game.
     /// </summary>
-    GameState gameState;
-    GameState lastGameState;
+    TetrisGrid grid;
 
-    /// <summary>
-    /// The main gridPlayer1 of the game.
-    /// </summary>
-    /// 
     TetrisGame game;
-
-    TetrisGrid gridPlayer1;
-    TetrisGrid gridPlayer2;
 
     Block block;
     Block previewBlock;
 
     RandomBag bag;
 
-    GameOverScreen gameOverScreen;
-    MainMenu mainMenu;
-
-    MediaPlayer mediaPlayer;
-
-    SoundEffect themeSong, shittySong;
     SoundEffect gameOverSound;
 
-    Texture2D background1, background2;
+    Keys rotateLeftKey, moveLeftKey, rotateRightKey, moveRightKey, moveDownKey, hardDropKey;
 
     float secondsUntilNextTick;
     float secondsPerTick = 1;
 
     int score;
     int level;
+    int linesClearedSinceLevelUp;
 
     double leftHeldForSeconds;
     double rightHeldForSeconds;
     double downHeldForSeconds;
 
-    bool is2Player;
+    Vector2 worldOffset;
 
-    public GameWorld(TetrisGame tetrisGame)
+    Vector2 levelStringLocation, scoreStringLocation;
+
+    bool isPlayerOne;
+
+    public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space)
     {
         game = tetrisGame;
 
-        mediaPlayer = new MediaPlayer();
+        this.isPlayerOne = isPlayerOne;
 
         random = new Random();
-        gameState = GameState.MainMenu;
-
-        themeSong = TetrisGame.ContentManager.Load<SoundEffect>("TetrisTheme");
-        shittySong = TetrisGame.ContentManager.Load<SoundEffect>("shittyMusic");
-        mediaPlayer.AddSongToQueue(themeSong);
-        mediaPlayer.AddSongToQueue(shittySong);
 
         gameOverSound = TetrisGame.ContentManager.Load<SoundEffect>("gameOverSound");
 
-        font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
+        this.font = font;
 
-        background1 = TetrisGame.ContentManager.Load<Texture2D>("background");
+        grid = new TetrisGrid(this);
 
-        gridPlayer1 = new TetrisGrid();
-        gridPlayer2 = new TetrisGrid();
+        bag = new RandomBag(this);
 
-        bag = new RandomBag();
-
-        gameOverScreen = new GameOverScreen(font);
-        mainMenu = new MainMenu(font);
+        ChangeKeyBindings(moveLeft, rotateLeft, moveRight, rotateRight, moveDown, hardDrop);
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
@@ -109,16 +79,8 @@ class GameWorld
         score = 0;
         level = 1;
 
-        previewBlock = bag.NextBlock(gridPlayer1);
+        previewBlock = bag.NextBlock(grid);
         NewBlocks();
-    }
-
-    void Switch2PlayerMode()
-    {
-        is2Player = !is2Player;
-
-        gridPlayer1.OffsetGrid(new Vector2(-TetrisGame.WorldSize.X / 4, 0));
-        gridPlayer2.OffsetGrid(new Vector2(TetrisGame.WorldSize.X / 4, 0));
     }
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
@@ -127,18 +89,18 @@ class GameWorld
         double elapsedSeconds = gameTime.ElapsedGameTime.TotalSeconds;
 
         //updating timers for auto repeat
-        if (inputHelper.KeyDown(Keys.Left))
+        if (inputHelper.KeyDown(moveLeftKey))
             leftHeldForSeconds += elapsedSeconds;
         else
             leftHeldForSeconds = 0f;
 
-        if (inputHelper.KeyDown(Keys.Right))
+        if (inputHelper.KeyDown(moveRightKey))
             rightHeldForSeconds += elapsedSeconds;
         else
             rightHeldForSeconds = 0f;
 
         //updating timer for soft dropping
-        if(inputHelper.KeyDown(Keys.Down))
+        if (inputHelper.KeyDown(moveDownKey))
         {
             downHeldForSeconds += elapsedSeconds;
         }
@@ -160,14 +122,14 @@ class GameWorld
         }
 
         //code for regular horizontal movement, only if auto repeat is not occuring
-        if (inputHelper.KeyPressed(Keys.Left) && rightHeldForSeconds == 0f)
+        if (inputHelper.KeyPressed(moveLeftKey) && rightHeldForSeconds == 0f)
             block.MoveLeft();
 
-        if (inputHelper.KeyPressed(Keys.Right) && leftHeldForSeconds == 0f)
+        if (inputHelper.KeyPressed(moveRightKey) && leftHeldForSeconds == 0f)
             block.MoveRight();
 
         //code for soft dropping
-        if (inputHelper.KeyPressed(Keys.Down))
+        if (inputHelper.KeyPressed(moveDownKey))
             block.MoveDown();
         if (downHeldForSeconds > secondsPerTick / 20)
         {
@@ -175,106 +137,97 @@ class GameWorld
             downHeldForSeconds = 0f;
         }
         //code for hard dropping
-        if (inputHelper.KeyPressed(Keys.Space))
+        if (inputHelper.KeyPressed(hardDropKey))
             block.HardDrop();
 
-        if (inputHelper.KeyPressed(Keys.D))
+        if (inputHelper.KeyPressed(rotateRightKey))
             block.RotateRight();
 
-        if (inputHelper.KeyPressed(Keys.A))
+        if (inputHelper.KeyPressed(rotateLeftKey))
             block.RotateLeft();
     }
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
-        mediaPlayer.Update();
-
-        switch (gameState)
-        {
-            case GameState.MainMenu:
-                lastGameState = gameState;
-                mainMenu.Update(inputHelper);
-                break;
-            case GameState.Playing:
-                if (gameState != lastGameState)
-                    Reset();
-                UpdateTickTime(gameTime);
-                HandleInput(gameTime, inputHelper);
-                lastGameState = gameState;
-                break;
-            case GameState.GameOver:
-                lastGameState = gameState;
-                gameOverScreen.Update(inputHelper);
-                break;
-        }
+        UpdateTickTime(gameTime);
+        HandleInput(gameTime, inputHelper);
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Matrix spriteScale)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
-        switch (gameState)
-        {   
-            case GameState.MainMenu:
-                mainMenu.Draw(spriteBatch);
-                break;
-            case GameState.Playing:
-                DrawPlaying(gameTime, spriteBatch);
-                break;
+        grid.Draw(gameTime, spriteBatch, worldOffset);
+        block.Draw(spriteBatch, worldOffset);
+        previewBlock.Draw(spriteBatch, worldOffset);
 
-            case GameState.GameOver:
-                DrawPlaying(gameTime, spriteBatch);
-                gameOverScreen.Draw(spriteBatch);
-                break;      
-        }  
-        spriteBatch.End();
-    }
-
-    public void GameOver()
-    {
-        gameOverSound.Play();
-        game.IsMouseVisible = true;
-        gameState = GameState.GameOver;
+        spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + worldOffset, Color.Yellow);
+        spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + worldOffset, Color.Yellow);
     }
 
     public void Reset()
     {
-        gameState = GameState.Playing;
-        game.IsMouseVisible= false;
-
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
 
         score = 0;
         level = 1;
 
-        gridPlayer1.Clear();
+        grid.Clear();
 
-        previewBlock = bag.NextBlock(gridPlayer1);
+        previewBlock = bag.NextBlock(grid);
         NewBlocks();
     }
+    public void ApplyResolutionSettings()
+    {
+        grid.ApplyResolutionSettings();
+        levelStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 - 228, 33);
+        scoreStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 + 228, 33);
+    }
+
     public void NewBlocks()
     {
         secondsUntilNextTick = secondsPerTick;
         block = previewBlock;
         block.MoveToSpawnPosition();
-        previewBlock = bag.NextBlock(gridPlayer1);
+        previewBlock = bag.NextBlock(grid);
     }
     public void IncreaseScore(int LinesCleared)
     {
         if (LinesCleared == 4)
+        {
             score += 800 * level;
+
+            //send a line to the other player as a reward for getting a tetris
+            game.SendLine(isPlayerOne);
+        }
         else
             score += (2 * LinesCleared - 1) * 100 * level;
 
-        if(score >=  500 * (level * (level + 1)))
+        linesClearedSinceLevelUp += LinesCleared;
+
+        if (linesClearedSinceLevelUp >= 10)
         {
-            IncreaseLevel();
+            //save the linesClearedSinceLevelUp beacause the setLevel method resets it(so it can be used for syncing the level of the other player)
+            int currentLines = linesClearedSinceLevelUp;
+
+            //increase the level
+            game.SyncLevel(level + 1);
+            //send a line to the other player as a reward for completing the level first
+            game.SendLine(isPlayerOne);
+
+            linesClearedSinceLevelUp = currentLines % 10;
         }
     }
-    void IncreaseLevel()
+    public void setLevel(int level)
     {
-        level++;
+        linesClearedSinceLevelUp = 0;
+        this.level = level;
         secondsPerTick = MathF.Pow((0.8f - ((level - 1) * 0.007f)), level - 1);
+    }
+
+    public void ReceiveLine()
+    {
+        grid.MoveAllLinesUp();
+        block.MoveUp();
     }
     void UpdateTickTime(GameTime gameTime)
     {
@@ -288,7 +241,7 @@ class GameWorld
             ExecuteTick();
         }
     }
-    void ExecuteTick() 
+    void ExecuteTick()
     {
         //Moving the current block down.
         block.MoveDown();
@@ -296,25 +249,22 @@ class GameWorld
         //Resetting the tick timer.
         secondsUntilNextTick = secondsPerTick;
     }
-
-    void DrawPlaying(GameTime gameTime, SpriteBatch spriteBatch)
+    public void OffsetWorld(Vector2 offset)
     {
-        spriteBatch.Draw(background1, Vector2.Zero, Color.White);
-        gridPlayer1.Draw(gameTime, spriteBatch);
-        block.Draw(spriteBatch);
-        previewBlock.Draw(spriteBatch);
-        spriteBatch.DrawString(font, level.ToString(), new Vector2(171 - font.MeasureString(level.ToString()).X / 2, 22), Color.Yellow);
-        spriteBatch.DrawString(font, score.ToString(), new Vector2(628 - font.MeasureString(score.ToString()).X / 2, 22), Color.Yellow);
-        Debug.WriteLine(new Vector2(0, font.LineSpacing + font.MeasureString("Score: ").Y) + font.MeasureString("Level " + 1022940));
+        worldOffset = offset;
     }
-
-    public void StartNormalGame()
+    public void ChangeKeyBindings(Keys moveLeft, Keys rotateLeft, Keys moveRight, Keys rotateRight, Keys moveDown, Keys hardDrop)
     {
-        gameState = GameState.Playing;
+        moveLeftKey = moveLeft;
+        rotateLeftKey = rotateLeft;
+        moveRightKey = moveRight;
+        rotateRightKey = rotateRight;
+        moveDownKey = moveDown;
+        hardDropKey = hardDrop;
     }
-    public void ReturnToMainMenu() 
+    public void GameOver()
     {
-        gameState = GameState.MainMenu;
+        gameOverSound.Play();
+        game.GameOver(isPlayerOne);
     }
-
 }
