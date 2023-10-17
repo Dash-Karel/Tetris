@@ -183,6 +183,7 @@ class GameWorld
 
         grid.Clear();
 
+        holdBlock = null;
         previewBlock = bag.NextBlock(grid);
         NewBlocks();
     }

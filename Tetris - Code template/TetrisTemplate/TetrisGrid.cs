@@ -86,9 +86,7 @@ class TetrisGrid
 
     public void SetValueInGrid(Point cell, CellType value)
     {
-        if (!CellIsWithinGrid(cell))
-            Debug.WriteLine("index out of range" + cell);
-        else
+        if (CellIsWithinGrid(cell))
             grid[cell.X, cell.Y] = value;
     }
     //----------------------------------------------------------------------

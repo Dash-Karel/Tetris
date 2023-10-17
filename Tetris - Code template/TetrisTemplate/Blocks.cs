@@ -4,11 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 internal class Block
 {
-    Texture2D texture;
+    public enum BlockType { normal, explosive}
+    BlockType blockType;
+
+    Texture2D texture, bombTex;
     TetrisGrid grid;
     GameWorld gameWorld;
 
-    SoundEffect placeSound;
+    SoundEffect placeSound, explosionSound;
 
     Vector2 offset;
 
@@ -23,15 +26,16 @@ internal class Block
         get { return shape.GetLength(0); }
     }
 
-    protected Block(TetrisGrid grid, GameWorld gameWorld)
+    protected Block(TetrisGrid grid, GameWorld gameWorld, BlockType type = BlockType.normal)
     {
         this.gameWorld = gameWorld;
         placeSound = TetrisGame.ContentManager.Load<SoundEffect>("placeBlockSound");
+        explosionSound = TetrisGame.ContentManager.Load<SoundEffect>("explosionSound");
         texture = TetrisGame.ContentManager.Load<Texture2D>("block");
+        bombTex = TetrisGame.ContentManager.Load<Texture2D>("bomb");
         this.grid = grid;
 
-        //ensures sprite is drawn in the next box
-        offset = new Vector2(228, 186);
+        blockType = type;
     }
     public void Draw(SpriteBatch spriteBatch, Vector2 worldOffset)
     {
@@ -40,7 +44,16 @@ internal class Block
             for (int height = 0; height < Size; height++)
             {
                 if (shape[width, height] == true)
-                    spriteBatch.Draw(texture, grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height) + offset + worldOffset, grid.CellColors[(int)color]);
+                {
+                    Vector2 drawPos = grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height) + offset + worldOffset;
+                    spriteBatch.Draw(texture, drawPos, grid.CellColors[(int)color]);
+                    switch(blockType)
+                    {
+                        case BlockType.explosive:
+                            spriteBatch.Draw(bombTex, drawPos, Color.White);
+                            break;
+                    }
+                }
             }
         }
     }
@@ -63,8 +76,19 @@ internal class Block
             for (int y = 0; y < Size; y++)
                 if (shape[x, y])
                 {
+                    switch (blockType)
+                    {
+                        case BlockType.normal:
+                            grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
+                            break;
+                        case BlockType.explosive:
+                            for (int explosionX = -2; explosionX < 3; explosionX++)
+                                for (int explosionY = -2; explosionY < 3; explosionY++)
+                                    grid.SetValueInGrid(new Point(position.X + x + explosionX, position.Y + y + explosionY), TetrisGrid.CellType.empty);
+                            break;
+                    }
+
                     bottomOfBlockCoordinate = y;
-                    grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
                 }
 
         //If the bottom of the block lies outside the grid when placing it the game is over
@@ -74,7 +98,15 @@ internal class Block
             return;
         }
 
-        placeSound.Play();
+        switch (blockType)
+        {
+            case BlockType.normal:
+                placeSound.Play();
+                break;
+            case BlockType.explosive:
+                explosionSound.Play();
+                break;
+        }
 
         // Check if any of the lines got full
         int[] yCoordinates = new int[Size];
@@ -177,7 +209,7 @@ internal class Block
 }
 internal class OBlock : Block
 {
-    public OBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public OBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         color = TetrisGrid.CellType.yellow;
         Reset();
@@ -192,7 +224,7 @@ internal class OBlock : Block
 }
 internal class IBlock : Block
 {
-    public IBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public IBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.lightBlue;
@@ -207,7 +239,7 @@ internal class IBlock : Block
 }
 internal class TBlock : Block
 {
-    public TBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public TBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.purple;
@@ -222,7 +254,7 @@ internal class TBlock : Block
 }
 internal class LBlock : Block
 {
-    public LBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public LBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.orange;
@@ -238,7 +270,7 @@ internal class LBlock : Block
 }
 internal class JBlock : Block
 {
-    public JBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public JBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.darkBlue;
@@ -253,7 +285,7 @@ internal class JBlock : Block
 }
 internal class SBlock : Block
 {
-    public SBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public SBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.green;
@@ -268,7 +300,7 @@ internal class SBlock : Block
 }
 internal class ZBlock : Block
 {
-    public ZBlock(TetrisGrid grid, GameWorld gameWorld) : base(grid, gameWorld)
+    public ZBlock(TetrisGrid grid, GameWorld gameWorld, BlockType type) : base(grid, gameWorld, type)
     {
         Reset();
         color = TetrisGrid.CellType.red;
