@@ -32,11 +32,14 @@ class GameWorld
     Block block;
     Block previewBlock;
 
+    Block holdBlock;
+    bool holdUsed;
+
     RandomBag bag;
 
     SoundEffect gameOverSound;
 
-    Keys rotateLeftKey, moveLeftKey, rotateRightKey, moveRightKey, moveDownKey, hardDropKey;
+    Keys rotateLeftKey, moveLeftKey, rotateRightKey, moveRightKey, moveDownKey, hardDropKey, holdKey;
 
     float secondsUntilNextTick;
     float secondsPerTick = 1;
@@ -55,7 +58,7 @@ class GameWorld
 
     bool isPlayerOne;
 
-    public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space)
+    public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space, Keys hold = Keys.LeftShift)
     {
         game = tetrisGame;
 
@@ -71,7 +74,7 @@ class GameWorld
 
         bag = new RandomBag(this);
 
-        ChangeKeyBindings(moveLeft, rotateLeft, moveRight, rotateRight, moveDown, hardDrop);
+        ChangeKeyBindings(moveLeft, rotateLeft, moveRight, rotateRight, moveDown, hardDrop, hold);
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
@@ -81,6 +84,8 @@ class GameWorld
 
         previewBlock = bag.NextBlock(grid);
         NewBlocks();
+
+        holdUsed = false;
     }
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
@@ -145,6 +150,9 @@ class GameWorld
 
         if (inputHelper.KeyPressed(rotateLeftKey))
             block.RotateLeft();
+
+        if (inputHelper.KeyPressed(holdKey))
+            Hold();
     }
 
     public void Update(GameTime gameTime, InputHelper inputHelper)
@@ -158,6 +166,8 @@ class GameWorld
         grid.Draw(gameTime, spriteBatch, worldOffset);
         block.Draw(spriteBatch, worldOffset);
         previewBlock.Draw(spriteBatch, worldOffset);
+        if(holdBlock != null)
+            holdBlock.Draw(spriteBatch, worldOffset);
 
         spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + worldOffset, Color.Yellow);
         spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + worldOffset, Color.Yellow);
@@ -182,9 +192,27 @@ class GameWorld
         levelStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 - 228, 33);
         scoreStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 + 228, 33);
     }
-
+    void Hold()
+    {
+        if (!holdUsed)
+        {
+            Block currentHeld = holdBlock;
+            holdBlock = block;
+            holdBlock.Reset();
+            holdBlock.setOffset(new Vector2(-93, 155));
+            if (!(currentHeld == null))
+            {
+                block = currentHeld;
+                block.MoveToSpawnPosition();
+            }
+            else
+                NewBlocks();
+            holdUsed = true;
+        }
+    }
     public void NewBlocks()
     {
+        holdUsed = false;
         secondsUntilNextTick = secondsPerTick;
         block = previewBlock;
         block.MoveToSpawnPosition();
@@ -253,7 +281,7 @@ class GameWorld
     {
         worldOffset = offset;
     }
-    public void ChangeKeyBindings(Keys moveLeft, Keys rotateLeft, Keys moveRight, Keys rotateRight, Keys moveDown, Keys hardDrop)
+    public void ChangeKeyBindings(Keys moveLeft, Keys rotateLeft, Keys moveRight, Keys rotateRight, Keys moveDown, Keys hardDrop, Keys hold)
     {
         moveLeftKey = moveLeft;
         rotateLeftKey = rotateLeft;
@@ -261,6 +289,7 @@ class GameWorld
         rotateRightKey = rotateRight;
         moveDownKey = moveDown;
         hardDropKey = hardDrop;
+        holdKey = hold;
     }
     public void GameOver()
     {

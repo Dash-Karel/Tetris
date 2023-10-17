@@ -101,7 +101,7 @@ class TetrisGame : Game
         background2Player = ContentManager.Load<Texture2D>("backgroundTwoPlayers");
 
         gameWorldPlayer1 = new GameWorld(this, font, true);
-        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl);
+        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl, Keys.O);
 
         gameWorldPlayer1.Reset();
         gameWorldPlayer2.Reset();
@@ -235,7 +235,7 @@ class TetrisGame : Game
             ApplyResolutionSettings(FullScreen);
             gameWorldPlayer1.OffsetWorld(new Vector2(-WorldSize.X / 4, 0));
             gameWorldPlayer2.OffsetWorld(new Vector2(WorldSize.X / 4, 0));
-            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S);
+            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.E);
         }
         else
         {
@@ -243,7 +243,7 @@ class TetrisGame : Game
             WorldSize = new Point(background.Width, background.Height);
             windowSize = WorldSize;
             ApplyResolutionSettings(FullScreen);
-            gameWorldPlayer1.ChangeKeyBindings(Keys.Left, Keys.A, Keys.Right, Keys.D, Keys.Down, Keys.Space);
+            gameWorldPlayer1.ChangeKeyBindings(Keys.Left, Keys.A, Keys.Right, Keys.D, Keys.Down, Keys.Space, Keys.LeftShift);
         }
     }
 
