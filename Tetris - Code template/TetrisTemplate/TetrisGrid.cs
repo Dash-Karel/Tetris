@@ -16,7 +16,9 @@ class TetrisGrid
         orange,
         darkBlue,
         green,
-        red
+        red,
+        none
+
     }
 
     /// The sprite of a single empty cell in the grid.
@@ -26,10 +28,12 @@ class TetrisGrid
     Vector2 position, origin;
 
     //array for mapping colours to a value
-    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red };
+    Color[] cellColors = new Color[] { Color.LightGray, Color.Yellow, Color.LightBlue, Color.Purple, Color.Orange, Color.DarkBlue, Color.Green, Color.Red, Color.Transparent };
 
     //array representing the grid
     CellType[,] grid;
+
+    CellType[,] movementGrid;
 
     public CellType[,] Grid { get { return grid; } }
 
@@ -41,12 +45,30 @@ class TetrisGrid
     /// The number of grid elements in the y-direction.
     public int Height { get { return 20; } }
 
+    public float secondsPerTick
+    {
+        private get;
+        set;
+    }
+
+    float secondsSinceLastTick;
+
+    float movementOffset;
+
+    bool isMoving;
+
+    int movementFactor;
+
     /// <summary>
     /// Creates a new TetrisGrid.
     /// </summary>
     /// <param name="b"></param>
     public TetrisGrid()
     {
+        movementOffset = 0;
+        isMoving = false;
+        secondsSinceLastTick = 0;
+        movementFactor = 0;
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         position = new Vector2(TetrisGame.ScreenSize.X, TetrisGame.ScreenSize.Y) / 2;
         origin = new Vector2(Width * emptyCell.Width, Height * emptyCell.Height) / 2;
@@ -58,7 +80,7 @@ class TetrisGrid
     /// </summary>
     /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
     /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch)
     {
         for (int width = 0; width < Width; width++)
         {
@@ -66,6 +88,27 @@ class TetrisGrid
             {
                 spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height), cellColors[(int)grid[width, height]]);
             }
+        }
+        if (isMoving)
+        {
+            for (int width = 0; width < Width; width++)
+            {
+                for (int height = 0; height < Height; height++)
+                {
+                    spriteBatch.Draw(emptyCell, position - origin + new Vector2(width * emptyCell.Width, height * emptyCell.Height) + new Vector2(0, movementOffset), cellColors[(int)movementGrid[width, height]]);
+                }
+            }
+        }
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        if (isMoving)
+        {
+            secondsSinceLastTick += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            movementOffset = secondsSinceLastTick * emptyCell.Height / secondsPerTick * movementFactor;
+            if (secondsSinceLastTick >= secondsPerTick)
+                StopMoving();
         }
     }
 
@@ -75,6 +118,7 @@ class TetrisGrid
     public void Clear()
     {
         grid = new CellType[Width, Height];
+        movementGrid = new CellType[Width, Height];
     }
 
     public void SetValueInGrid(Point cell, CellType value)
@@ -89,6 +133,7 @@ class TetrisGrid
     public void CheckLines(int[] yCoordinates)
     {
         int LinesCleared = 0;
+        int lastLinesCleared = 0;
         foreach (int yCoordinate in yCoordinates)
         {
             if (yCoordinate >= Height || yCoordinate < 0)
@@ -108,10 +153,16 @@ class TetrisGrid
             {
                 DeleteLine(yCoordinate);
                 LinesCleared++;
+                lastLinesCleared = yCoordinate;
             }
         }
         if(LinesCleared > 0)
+        {
             TetrisGame.GameWorld.IncreaseScore(LinesCleared);
+            MoveCellsDown(lastLinesCleared, LinesCleared);
+        }
+            
+
     }
     void DeleteLine(int yCoordinate)
     {
@@ -119,13 +170,49 @@ class TetrisGrid
         { 
             grid[x, yCoordinate] = CellType.empty;                
         }
-        MoveCellsDown(yCoordinate);
     }
-    void MoveCellsDown(int startingYCoordinate)
+    
+    void MoveCellsDown(int startingYCoordinate, int linesCleared)
     {
-        for(int x=0; x < Width; x++)
+        movementFactor = linesCleared;
+        movementGrid = new CellType[Width, Height];
+        for (int x=0; x < Width; x++)
+        {
+            for (int y = startingYCoordinate; y > -1; y--)
+            {
+                if (grid[x,y] == CellType.empty)
+                    movementGrid[x, y] = CellType.none;
+                else
+                    movementGrid[x,y] = grid[x,y];
+            }
+            for (int y = Height - 1; y > startingYCoordinate; y--)
+            {
+                movementGrid[x, y] = CellType.none;
+            }
+        }
+        isMoving = true;
+
+        for (int x=0; x < Width; x++)
             for (int y = startingYCoordinate; y > 0; y--)
-                grid[x,y] = grid[x,y - 1];
+                grid[x,y] = CellType.empty;
+    }
+    void StopMoving()
+    {
+        for (int x=0; x < Width; x++)
+        {
+            for (int y=0; y < Height; y++)
+            {
+                if (movementGrid[x,y] != CellType.none)
+                {
+                    grid[x, y + movementFactor] = movementGrid[x,y];
+                }
+            }
+        }
+        movementFactor = 1;
+        movementGrid = new CellType[Width, Height];
+        movementOffset = 0;
+        secondsSinceLastTick = 0;
+        isMoving = false;
     }
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------

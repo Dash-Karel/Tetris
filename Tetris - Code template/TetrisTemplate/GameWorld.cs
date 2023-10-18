@@ -50,7 +50,7 @@ class GameWorld
     MainMenu mainMenu;
 
     float secondsUntilNextTick;
-    float secondsPerTick = 1;
+    float secondsPerTick;
 
     int score;
     int level;
@@ -72,6 +72,7 @@ class GameWorld
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
+        grid.secondsPerTick = secondsPerTick;
 
         score = 0;
         level = 1;
@@ -115,6 +116,7 @@ class GameWorld
             case GameState.Playing:
                 UpdateTickTime(gameTime);
                 HandleInput(gameTime, inputHelper);
+                grid.Update(gameTime);
                 break;
             case GameState.GameOver:
                 gameOverScreen.Update();
@@ -155,6 +157,7 @@ class GameWorld
 
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
+        grid.secondsPerTick = secondsPerTick;
 
         score = 0;
         level = 1;
@@ -187,6 +190,7 @@ class GameWorld
     {
         level++;
         secondsPerTick = MathF.Pow((0.8f - ((level - 1) * 0.007f)), level - 1);
+        grid.secondsPerTick = secondsPerTick;
     }
     void UpdateTickTime(GameTime gameTime)
     {
@@ -211,7 +215,7 @@ class GameWorld
 
     void DrawPlaying(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        grid.Draw(gameTime, spriteBatch);
+        grid.Draw(spriteBatch);
         block.Draw(spriteBatch);
         previewBlock.Draw(spriteBatch);
         spriteBatch.DrawString(font, "Level: " + level.ToString(), Vector2.Zero, Color.White);
