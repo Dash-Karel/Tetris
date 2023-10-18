@@ -20,7 +20,7 @@ namespace TetrisTemplate
             this.gameWorld = gameWorld;
             bag = new byte[7];
             choicePool = new List<byte>(7);
-            SpecialBlockChance = 10;
+            SpecialBlockChance = 15;
             Refill();
         }
 
@@ -33,7 +33,7 @@ namespace TetrisTemplate
             //Determine whether a special block should be spawned(random) and then pick a random special type
             Block.BlockType type = Block.BlockType.normal;
             if (GameWorld.Random.NextSingle() * 100f < SpecialBlockChance)
-                type = (Block.BlockType)(GameWorld.Random.Next(1) + 1);
+                type = (Block.BlockType)(GameWorld.Random.Next(3) + 1);
             
 
 
