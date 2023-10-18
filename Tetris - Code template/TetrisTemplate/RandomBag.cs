@@ -20,7 +20,7 @@ namespace TetrisTemplate
             this.gameWorld = gameWorld;
             bag = new byte[7];
             choicePool = new List<byte>(7);
-            SpecialBlockChance = 0;
+            SpecialBlockChance = 10;
             Refill();
         }
 
