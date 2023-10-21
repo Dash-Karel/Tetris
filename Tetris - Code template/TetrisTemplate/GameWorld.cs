@@ -171,7 +171,7 @@ class GameWorld
         if(holdBlock != null)
             holdBlock.Draw(spriteBatch, worldOffset);
         if (targetShapeMode)
-            targetShape.Draw(spriteBatch);
+            targetShape.Draw(spriteBatch, worldOffset);
 
         spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + worldOffset, Color.Yellow);
         spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + worldOffset, Color.Yellow);
@@ -199,6 +199,7 @@ class GameWorld
     public void ApplyResolutionSettings()
     {
         grid.ApplyResolutionSettings();
+        targetShape.ApplyResolutionSettings();
         levelStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 - 228, 33);
         scoreStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 + 228, 33);
     }
