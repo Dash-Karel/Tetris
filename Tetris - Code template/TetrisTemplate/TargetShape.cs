@@ -86,20 +86,20 @@ internal class TargetShape
         blockTexture = TetrisGame.ContentManager.Load<Texture2D>("block");
 
         //Setting the position.
-        position = new Vector2(50, 450);
+        ApplyResolutionSettings();
         
     }
     /// <summary>
     /// Draws the shape in the bottem left corner.
     /// </summary>
     /// <param name="spriteBatch"></param> Used for drawing textures in MonoGame
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch, Vector2 worldOffset)
     {
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
             {
-                Vector2 drawPos = position + new Vector2(x * blockTexture.Width, y * blockTexture.Height);
+                Vector2 drawPos = position + new Vector2(x * blockTexture.Width, y * blockTexture.Height) + worldOffset;
                 spriteBatch.Draw(blockTexture, drawPos, grid.CellColors[(int)shape[currentShapeIndex][x, y]]);
 
             }
@@ -111,6 +111,10 @@ internal class TargetShape
     public void NewShape()
     {
         currentShapeIndex = GameWorld.Random.Next(amountOffDifferentShapes);
+    }
+    public void ApplyResolutionSettings()
+    {
+        position = new Vector2(TetrisGame.WorldSize.X / 2 - 287, 355);
     }
 }
 
