@@ -68,6 +68,8 @@ class TetrisGame : Game
         IsMouseVisible = isVisible;
     }
 
+    bool targetShapeMode = true;
+
     [STAThread]
     static void Main(string[] args)
     {
@@ -105,10 +107,11 @@ class TetrisGame : Game
         background2Player = ContentManager.Load<Texture2D>("backgroundTwoPlayers");
 
         gameWorldPlayer1 = new GameWorld(this, font, true);
-        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.NumPad1, Keys.OemOpenBrackets, Keys.NumPad3, Keys.OemBackslash, Keys.NumPad2, Keys.RightShift, Keys.OemCloseBrackets);
+        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl, Keys.O);
 
-        gameWorldPlayer1.Reset();
-        gameWorldPlayer2.Reset();
+
+        gameWorldPlayer1.Reset(targetShapeMode);
+        gameWorldPlayer2.Reset(targetShapeMode);
 
         mediaPlayer = new MediaPlayer();
 
@@ -206,8 +209,8 @@ class TetrisGame : Game
     {
         IsMouseVisible = false;
         gameState = GameState.Playing;
-        gameWorldPlayer1.Reset();
-        gameWorldPlayer2.Reset();
+        gameWorldPlayer1.Reset(targetShapeMode);
+        gameWorldPlayer2.Reset(targetShapeMode);
         EffectsManager.Reset();
     }
     public void StartNormalGame()
@@ -244,7 +247,7 @@ class TetrisGame : Game
             ApplyResolutionSettings(FullScreen);
             gameWorldPlayer1.OffsetWorld(new Vector2(-WorldSize.X / 4, 0));
             gameWorldPlayer2.OffsetWorld(new Vector2(WorldSize.X / 4, 0));
-            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.LeftShift);
+            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.E);
         }
         else
         {

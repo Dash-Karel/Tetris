@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -123,6 +125,66 @@ class TetrisGrid
             gameWorld.IncreaseScore(LinesCleared);
             lineClearSound.Play();
         }
+    }
+    public bool CheckTargetShape(int[] yCoordinates, TetrisGrid.CellType[,] shape)
+    {
+
+        //Calculating the amount of empty lines in shape
+        int emptyShapeLines = 0;
+        for (int yOfShape = 0; yOfShape < shape.GetLength(0); yOfShape++)
+        {
+            bool shapeLineIsEmpty = true;
+            for (int xOfShape = 0; xOfShape < shape.GetLength(1); xOfShape++)
+            {
+                if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
+                {
+                    shapeLineIsEmpty = false;
+                }
+            }
+            if (shapeLineIsEmpty)
+                emptyShapeLines++;
+        }
+            int LinesCleared = 0;
+        foreach (int yCoordinate in yCoordinates)
+        {
+            if (yCoordinate >= Height - shape.GetLength(1) + 1|| yCoordinate < 0)
+                continue;
+
+            for (int x = 0; x < Width - shape.GetLength(0) + 1; x++)
+            {
+                bool isShape = true;
+                for (int xOfShape = 0; xOfShape < shape.GetLength(0); xOfShape++)
+                {
+                    for (int yOfShape = 0; yOfShape < shape.GetLength(1); yOfShape++)
+                    {
+                        
+                        if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
+                        {
+                            if (grid[x + xOfShape, yCoordinate + yOfShape] != shape[xOfShape, yOfShape])
+                            {
+                                isShape = false;
+                            }
+                        }
+                    }
+                }
+                if (isShape)
+                {
+                    for (int yOfShape = emptyShapeLines; yOfShape < shape.GetLength(1); yOfShape++)
+                    {
+                        DeleteLine(yCoordinate + yOfShape);
+                        LinesCleared++;
+                        
+                    }
+                }
+            }
+        }
+        if (LinesCleared > 0)
+        {
+            gameWorld.IncreaseScore(LinesCleared);
+            lineClearSound.Play();
+            return true;
+        }
+        return false;
     }
 
     /// <summary>

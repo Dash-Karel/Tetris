@@ -36,6 +36,8 @@ class GameWorld
 
     RandomBag bag;
 
+    TargetShape targetShape;
+
     SoundEffect gameOverSound;
 
     Keys rotateLeftKey, moveLeftKey, rotateRightKey, moveRightKey, moveDownKey, hardDropKey, holdKey;
@@ -56,6 +58,7 @@ class GameWorld
     Vector2 levelStringLocation, scoreStringLocation;
 
     bool isPlayerOne;
+    bool targetShapeMode;
 
     public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space, Keys hold = Keys.LeftShift)
     {
@@ -167,13 +170,20 @@ class GameWorld
         previewBlock.Draw(spriteBatch, worldOffset);
         if(holdBlock != null)
             holdBlock.Draw(spriteBatch, worldOffset);
+        if (targetShapeMode)
+            targetShape.Draw(spriteBatch);
 
         spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + worldOffset, Color.Yellow);
         spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + worldOffset, Color.Yellow);
     }
 
-    public void Reset()
+    public void Reset(bool targetShapeMode)
     {
+        this.targetShapeMode = targetShapeMode;
+
+        if (targetShapeMode)
+            targetShape = new TargetShape(grid);
+
         secondsUntilNextTick = secondsPerTick;
         secondsPerTick = 1;
 
@@ -297,5 +307,12 @@ class GameWorld
     {
         gameOverSound.Play();
         game.GameOver(isPlayerOne);
+    }
+    public void CheckTargetShape(int[] yCoordinates)
+    {
+        if (grid.CheckTargetShape(yCoordinates, targetShape.Shape))
+        {
+            targetShape.NewShape();
+        }
     }
 }
