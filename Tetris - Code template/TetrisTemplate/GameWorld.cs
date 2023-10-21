@@ -310,7 +310,7 @@ class GameWorld
     }
     public void CheckTargetShape(int[] yCoordinates)
     {
-        if (grid.CheckTargetShape(yCoordinates, targetShape.Shape))
+        if (grid.CheckTargetShape(targetShape.Shape))
         {
             targetShape.NewShape();
         }

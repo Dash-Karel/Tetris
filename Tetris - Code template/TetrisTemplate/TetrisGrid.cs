@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 /// <summary>
 /// A class for representing the Tetris playing grid.
@@ -124,10 +125,16 @@ class TetrisGrid
             lineClearSound.Play();
         }
     }
-    public bool CheckTargetShape(int[] yCoordinates, TetrisGrid.CellType[,] shape)
+    /// <summary>
+    /// Checks if the target shape is made by looping over all the y coordinates 
+    /// and checking if the blocks under and to the right correspond to the shape that is given.
+    /// </summary>
+    /// <param name="shape"></param> Is an array of the shape that needs to be checked for
+    /// <returns></returns> Returns a boolean to signal if the shape has been completed.
+    public bool CheckTargetShape(TetrisGrid.CellType[,] shape)
     {
 
-        //Calculating the amount of empty lines in shape
+        //Calculating the amount of empty lines in the shape
         int emptyShapeLines = 0;
         for (int yOfShape = 0; yOfShape < shape.GetLength(0); yOfShape++)
         {
@@ -142,31 +149,36 @@ class TetrisGrid
             if (shapeLineIsEmpty)
                 emptyShapeLines++;
         }
-            int LinesCleared = 0;
-        foreach (int yCoordinate in yCoordinates)
+        int LinesCleared = 0;
+        //Looping over all the y coordinates.
+        for (int yCoordinate = 0; yCoordinate < Height - shape.GetLength(1) + 1; yCoordinate++)
         {
+            //Checking to see if we are within the grid
             if (yCoordinate >= Height - shape.GetLength(1) + 1|| yCoordinate < 0)
                 continue;
 
+            //Looping over all the x coordinates.
             for (int x = 0; x < Width - shape.GetLength(0) + 1; x++)
             {
                 bool isShape = true;
+                //Looping over the shape grid
                 for (int xOfShape = 0; xOfShape < shape.GetLength(0); xOfShape++)
                 {
                     for (int yOfShape = 0; yOfShape < shape.GetLength(1); yOfShape++)
                     {
-                        
+                        //Checking if the shape type is empty if so the check for that cell will be skipped.
                         if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
                         {
+                            //Checking if the cell type in the shape is the same as the one in the grid
                             if (Grid[x + xOfShape, yCoordinate + yOfShape] != shape[xOfShape, yOfShape])
                             {
                                 isShape = false;
                             }
                         }
                     }
-                }
+                }//Deleting the lines if the shape is found
                 if (isShape)
-                {
+                {//Also skipping the empty lines in the shape
                     for (int yOfShape = emptyShapeLines; yOfShape < shape.GetLength(1); yOfShape++)
                     {
                         DeleteLine(yCoordinate + yOfShape);
@@ -175,7 +187,7 @@ class TetrisGrid
                     }
                 }
             }
-        }
+        }//If lines have been cleared, play a sound to indicate this and increase the score.
         if (LinesCleared > 0)
         {
             gameWorld.IncreaseScore(LinesCleared);
