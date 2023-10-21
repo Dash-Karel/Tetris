@@ -76,19 +76,33 @@ internal class Block
         //variable for keeping track of where the actual bottom of the block is
         int bottomOfBlockCoordinate = 0;
 
-        //place the block in the grid
         for (int x = 0; x < Size; x++)
+        {
+            for(int y = Size - 1; y >= 0; y--)
+            {
+                //play general placement effects
+                if (!grid.CellIsValid(new Point(position.X + x, position.Y + y + 1)) && shape[x,y])
+                    TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y + 1)), MathF.PI, 200f, Color.LightGray, 1, "dust", 10f);
+            }
             for (int y = 0; y < Size; y++)
+            {
                 if (shape[x, y])
                 {
+                    //place the block in the grid
                     grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
                     bottomOfBlockCoordinate = y;
                 }
+            }
+        }
+
 
         //for most of these functions the blocks should all be placed first before they can be called so they need to be in a seperate loop
         for (int x = 0; x < Size; x++)
+        {
             for (int y = 0; y < Size; y++)
+            {
                 if (shape[x, y])
+                {
                     switch (blockType)
                     {
                         case BlockType.explosive:
@@ -104,10 +118,10 @@ internal class Block
                             if (x + 1 >= Size || !shape[x + 1, y])
                                 TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x + 1, position.Y + y)), 0.5f * MathF.PI, effectSpeed, Color.White, 2f, "fire", rotationSpeed);
                             if (y - 1 < 0 || !shape[x, y - 1])
-                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y - 1)), 1f * MathF.PI, effectSpeed, Color.White, 2f, "fire", rotationSpeed);
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y - 1)), MathF.PI, effectSpeed, Color.White, 2f, "fire", rotationSpeed);
                             if (y + 1 >= Size || !shape[x, y + 1])
                                 TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y + 1)), 0f, effectSpeed, Color.White, 2f, "fire", rotationSpeed);
-                            if (x - 1 < 0 || y - 1 < 0 ||!shape[x - 1, y - 1])
+                            if (x - 1 < 0 || y - 1 < 0 || !shape[x - 1, y - 1])
                                 TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x - 1, position.Y + y - 1)), 1.25f * MathF.PI, effectSpeed, Color.White, 2.828f, "fire", rotationSpeed);
                             if (x + 1 >= Size || y + 1 >= Size || !shape[x + 1, y + 1])
                                 TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x + 1, position.Y + y + 1)), 0.25f * MathF.PI, effectSpeed, Color.White, 2.828f, "fire", rotationSpeed);
@@ -131,6 +145,9 @@ internal class Block
                             }
                             break;
                     }
+                }
+            }
+        }
 
         //If the bottom of the block lies outside the grid when placing it the game is over
         if (position.Y + bottomOfBlockCoordinate < 0)
