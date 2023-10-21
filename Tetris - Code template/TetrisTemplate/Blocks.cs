@@ -117,12 +117,18 @@ internal class Block
                                 TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y)), 0.75f * MathF.PI, effectSpeed, 2.828f, "fire", rotationSpeed);
                             break;
                         case BlockType.pushDown:
-                            grid.PushCellsDown(new Point(position.X + x, position.Y + y));
-                            TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y)), 0f, 800f, grid.Height - (position.Y + y));
+                            if (position.Y + y >= 0)
+                            {
+                                grid.PushCellsDown(new Point(position.X + x, position.Y + y));
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y)), 0f, 800f, grid.Height - (position.Y + y));
+                            }
                             break;
                         case BlockType.pullUp:
-                            grid.PullCellsUp((new Point(position.X + x, position.Y + y)));
-                            TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, grid.Height - 1)), 1f* MathF.PI, 800f, grid.Height - (position.Y + y) - 1);
+                            if (position.Y + y >= 0)
+                            {
+                                grid.PullCellsUp((new Point(position.X + x, position.Y + y)));
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, grid.Height - 1)), 1f * MathF.PI, 800f, grid.Height - (position.Y + y) - 1);
+                            }
                             break;
                     }
 
