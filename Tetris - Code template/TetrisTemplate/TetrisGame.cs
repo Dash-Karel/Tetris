@@ -66,6 +66,8 @@ class TetrisGame : Game
         IsMouseVisible = isVisible;
     }
 
+    bool targetShapeMode = true;
+
     [STAThread]
     static void Main(string[] args)
     {
@@ -103,8 +105,9 @@ class TetrisGame : Game
         gameWorldPlayer1 = new GameWorld(this, font, true);
         gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl, Keys.O);
 
-        gameWorldPlayer1.Reset();
-        gameWorldPlayer2.Reset();
+
+        gameWorldPlayer1.Reset(targetShapeMode);
+        gameWorldPlayer2.Reset(targetShapeMode);
 
         mediaPlayer = new MediaPlayer();
 
@@ -198,8 +201,8 @@ class TetrisGame : Game
     {
         IsMouseVisible = false;
         gameState = GameState.Playing;
-        gameWorldPlayer1.Reset();
-        gameWorldPlayer2.Reset();
+        gameWorldPlayer1.Reset(targetShapeMode);
+        gameWorldPlayer2.Reset(targetShapeMode);
     }
     public void StartNormalGame()
     {

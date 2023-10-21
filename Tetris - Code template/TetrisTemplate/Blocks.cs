@@ -114,6 +114,7 @@ internal class Block
             yCoordinates[y] = position.Y + y;
 
         grid.CheckLines(yCoordinates);
+        gameWorld.CheckTargetShape(yCoordinates);
     }
     public void MoveToSpawnPosition()
     {
