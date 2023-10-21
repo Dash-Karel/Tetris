@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using TetrisTemplate;
 
 /// <summary>
 /// A class for representing the game world.
@@ -154,7 +153,7 @@ class GameWorld
         if (inputHelper.KeyPressed(holdKey))
             Hold();
     }
-
+    
     public void Update(GameTime gameTime, InputHelper inputHelper)
     {
         UpdateTickTime(gameTime);
@@ -208,6 +207,7 @@ class GameWorld
             }
             else
                 NewBlocks();
+
             holdUsed = true;
         }
     }
@@ -221,12 +221,13 @@ class GameWorld
     }
     public void IncreaseScore(int LinesCleared)
     {
-        if (LinesCleared == 4)
+        if (LinesCleared >= 4)
         {
-            score += 800 * level;
+            score += 200 * LinesCleared * level;
 
-            //send a line to the other player as a reward for getting a tetris
-            game.SendLine(isPlayerOne);
+            //send lines to the other player as a reward for getting a tetris
+            for(int x = 3; x < LinesCleared; x++)
+                game.SendLine(isPlayerOne);
         }
         else
             score += (2 * LinesCleared - 1) * 100 * level;

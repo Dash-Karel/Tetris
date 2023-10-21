@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
-using TetrisTemplate;
 
 class TetrisGame : Game
 {
@@ -49,6 +48,7 @@ class TetrisGame : Game
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>
     public static ContentManager ContentManager { get; private set; }
+    public static bool UseSpecialBlocks { get; set; }
 
 
     /// <summary>
@@ -90,6 +90,8 @@ class TetrisGame : Game
 
     protected override void LoadContent()
     {
+        UseSpecialBlocks = true;
+
         gameState = GameState.MainMenu;
         IsMouseVisible = true;
 
@@ -101,7 +103,7 @@ class TetrisGame : Game
         background2Player = ContentManager.Load<Texture2D>("backgroundTwoPlayers");
 
         gameWorldPlayer1 = new GameWorld(this, font, true);
-        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl, Keys.O);
+        gameWorldPlayer2 = new GameWorld(this, font, false, Keys.NumPad1, Keys.OemOpenBrackets, Keys.NumPad3, Keys.OemBackslash, Keys.NumPad2, Keys.RightShift, Keys.OemCloseBrackets);
 
         gameWorldPlayer1.Reset();
         gameWorldPlayer2.Reset();
@@ -235,7 +237,7 @@ class TetrisGame : Game
             ApplyResolutionSettings(FullScreen);
             gameWorldPlayer1.OffsetWorld(new Vector2(-WorldSize.X / 4, 0));
             gameWorldPlayer2.OffsetWorld(new Vector2(WorldSize.X / 4, 0));
-            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.E);
+            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.LeftShift);
         }
         else
         {

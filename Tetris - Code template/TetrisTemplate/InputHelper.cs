@@ -31,7 +31,7 @@ class InputHelper
     }
 
     /// <summary>
-    /// Gets the current position of the mouse cursor.
+    /// Gets the current position of the mouse cursor that is converted to a world coordinate.
     /// </summary>
     public Vector2 MousePosition
     {
