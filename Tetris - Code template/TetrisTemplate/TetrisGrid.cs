@@ -186,6 +186,37 @@ class TetrisGrid
         }
         MoveCellsDown(yCoordinate);
     }
+
+    public void PullCellsUp(Point pullPosition)
+    {
+        for(int y = pullPosition.Y; y < Height; y++)
+        {
+            for (int searchY = y; searchY < Height && searchY > pullPosition.Y && grid[pullPosition.X, y] == CellType.empty; searchY++)
+            {
+                if (grid[pullPosition.X, searchY] != CellType.empty)
+                {
+                    grid[pullPosition.X, y] = grid[pullPosition.X, searchY];
+                    grid[pullPosition.X, searchY] = CellType.empty;
+                }
+            }
+        }
+    }
+
+    public void PushCellsDown(Point pushPosition)
+    {
+        for (int y = Height - 1; y > pushPosition.Y; y--)
+        {
+            for(int searchY = y - 1; searchY >= pushPosition.Y && grid[pushPosition.X, y] == CellType.empty; searchY--)
+            {
+                if (grid[pushPosition.X, searchY] != CellType.empty)
+                {
+                    grid[pushPosition.X, y] = grid[pushPosition.X, searchY];
+                    grid[pushPosition.X, searchY] = CellType.empty;
+                }
+            }
+        }
+    }
+
     void MoveCellsDown(int startingYCoordinate)
     {
         for(int x=0; x < Width; x++)

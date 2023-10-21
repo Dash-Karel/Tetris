@@ -1,17 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using static Block;
 
 internal class Block
 {
-    public enum BlockType { normal, explosive}
+    public enum BlockType { normal, explosive, pushDown, pullUp}
     BlockType blockType;
+    Texture2D[] typeToTexture;
 
-    Texture2D texture, bombTex;
+    Texture2D texture;
     TetrisGrid grid;
     GameWorld gameWorld;
 
-    SoundEffect placeSound, explosionSound;
+    SoundEffect placeSound;
+    SoundEffect explosionSound, pushDownSound, pullUpSound;
 
     Vector2 offset;
 
@@ -31,8 +34,13 @@ internal class Block
         this.gameWorld = gameWorld;
         placeSound = TetrisGame.ContentManager.Load<SoundEffect>("placeBlockSound");
         explosionSound = TetrisGame.ContentManager.Load<SoundEffect>("explosionSound");
+        pushDownSound = TetrisGame.ContentManager.Load<SoundEffect>("pushDownSound");
+        pullUpSound = TetrisGame.ContentManager.Load<SoundEffect>("pullUpSound");
         texture = TetrisGame.ContentManager.Load<Texture2D>("block");
-        bombTex = TetrisGame.ContentManager.Load<Texture2D>("bomb");
+        typeToTexture = new Texture2D[4];
+        typeToTexture[(int)BlockType.explosive] = TetrisGame.ContentManager.Load<Texture2D>("bomb");
+        typeToTexture[(int)BlockType.pullUp] = TetrisGame.ContentManager.Load<Texture2D>("upArrow");
+        typeToTexture[(int)BlockType.pushDown] = TetrisGame.ContentManager.Load<Texture2D>("downArrow");
         this.grid = grid;
 
         blockType = type;
@@ -47,12 +55,8 @@ internal class Block
                 {
                     Vector2 drawPos = grid.GetPositionOfCell(position) + new Vector2(width * texture.Width, height * texture.Height) + offset + worldOffset;
                     spriteBatch.Draw(texture, drawPos, grid.CellColors[(int)color]);
-                    switch(blockType)
-                    {
-                        case BlockType.explosive:
-                            spriteBatch.Draw(bombTex, drawPos, Color.White);
-                            break;
-                    }
+                    if(blockType != BlockType.normal)
+                        spriteBatch.Draw(typeToTexture[(int)blockType], drawPos, Color.White);
                 }
             }
         }
@@ -76,20 +80,28 @@ internal class Block
             for (int y = 0; y < Size; y++)
                 if (shape[x, y])
                 {
+                    grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
+                    bottomOfBlockCoordinate = y;
+                }
+
+        //for most of these functions the blocks should all be placed first before they can be called so they need to be in a seperate loop
+        for (int x = 0; x < Size; x++)
+            for (int y = 0; y < Size; y++)
+                if (shape[x, y])
                     switch (blockType)
                     {
-                        case BlockType.normal:
-                            grid.SetValueInGrid(new Point(position.X + x, position.Y + y), color);
-                            break;
                         case BlockType.explosive:
                             for (int explosionX = -2; explosionX < 3; explosionX++)
                                 for (int explosionY = -2; explosionY < 3; explosionY++)
                                     grid.SetValueInGrid(new Point(position.X + x + explosionX, position.Y + y + explosionY), TetrisGrid.CellType.empty);
                             break;
+                        case BlockType.pushDown:
+                            grid.PushCellsDown(new Point(position.X + x, position.Y + y));
+                            break;
+                        case BlockType.pullUp:
+                            grid.PullCellsUp((new Point(position.X + x, position.Y + y)));
+                            break;
                     }
-
-                    bottomOfBlockCoordinate = y;
-                }
 
         //If the bottom of the block lies outside the grid when placing it the game is over
         if (position.Y + bottomOfBlockCoordinate < 0)
@@ -98,20 +110,34 @@ internal class Block
             return;
         }
 
+        // Check if any of the lines got full and play sounds
+        int numberOfChecks;
         switch (blockType)
         {
             case BlockType.normal:
                 placeSound.Play();
+                numberOfChecks = Size;
                 break;
             case BlockType.explosive:
                 explosionSound.Play();
+                numberOfChecks = 0;
+                break;
+            case BlockType.pushDown:
+                pushDownSound.Play();
+                numberOfChecks = grid.Height - position.Y;
+                break;
+            case BlockType.pullUp:
+                pullUpSound.Play();
+                numberOfChecks = grid.Height - position.Y;
+                break;
+            default:
+                numberOfChecks= 0;
                 break;
         }
 
-        // Check if any of the lines got full
-        int[] yCoordinates = new int[Size];
-        for (int y = 0; y < Size; y++)
-            yCoordinates[y] = position.Y + y;
+        int[] yCoordinates = new int[numberOfChecks];
+        for (int y = 0; y < numberOfChecks; y++)
+            yCoordinates[y] = y + position.Y;
 
         grid.CheckLines(yCoordinates);
         gameWorld.CheckTargetShape(yCoordinates);

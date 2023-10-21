@@ -91,6 +91,18 @@
 /processorParam:Quality=Best
 /build:buttonClickSound.wav
 
+#begin downArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:downArrow.png
+
 #begin explosionSound.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -115,6 +127,18 @@
 /processorParam:Quality=Best
 /build:placeBlockSound.wav
 
+#begin pullUpSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:pullUpSound.wav
+
+#begin pushDownSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:pushDownSound.wav
+
 #begin shittyMusic.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -133,4 +157,16 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:TetrisTheme.mp3
+
+#begin upArrow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:upArrow.png
 
