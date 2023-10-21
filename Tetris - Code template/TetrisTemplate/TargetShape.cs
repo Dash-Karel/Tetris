@@ -1,9 +1,10 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using System.Drawing;
 
+/// <summary>
+/// TargetShape is a class that shows an extra objective. This objective is shape of collers which can be made in game.
+/// When such an objective is reached there are an apropriate amount of lines cleared and a new objective is chosen.
+/// </summary>
 internal class TargetShape
 {
     TetrisGrid.CellType[][,] shape;
@@ -17,6 +18,7 @@ internal class TargetShape
     TetrisGrid grid;
     public TargetShape(TetrisGrid grid)
     {
+        //An array containing all the different shapes. With TetrisGrid CellTypes to indicate the coller. All shapes are a maximum of 4X4
         shape = new TetrisGrid.CellType[amountOffDifferentShapes][,] {
             new TetrisGrid.CellType[4, 4] {
                 { TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow },
@@ -55,8 +57,8 @@ internal class TargetShape
                 { TetrisGrid.CellType.darkBlue, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.orange}
             },
             new TetrisGrid.CellType[4, 4] {
-                { TetrisGrid.CellType.darkBlue, TetrisGrid.CellType.darkBlue, TetrisGrid.CellType.darkBlue, TetrisGrid.CellType.empty },
-                { TetrisGrid.CellType.darkBlue, TetrisGrid.CellType.green, TetrisGrid.CellType.green, TetrisGrid.CellType.empty },
+                { TetrisGrid.CellType.orange, TetrisGrid.CellType.orange, TetrisGrid.CellType.orange, TetrisGrid.CellType.empty },
+                { TetrisGrid.CellType.orange, TetrisGrid.CellType.green, TetrisGrid.CellType.green, TetrisGrid.CellType.empty },
                 { TetrisGrid.CellType.green, TetrisGrid.CellType.green, TetrisGrid.CellType.orange, TetrisGrid.CellType.empty },
                 { TetrisGrid.CellType.orange, TetrisGrid.CellType.orange, TetrisGrid.CellType.orange, TetrisGrid.CellType.empty }
             }};
@@ -77,13 +79,20 @@ internal class TargetShape
             shape[i] = newShape;
         }
         
-
+        //Randomizing which shape is the current shaper.
         NewShape();
 
         this.grid = grid;
-        position = new Vector2(50, 500);
         blockTexture = TetrisGame.ContentManager.Load<Texture2D>("block");
+
+        //Setting the position.
+        position = new Vector2(50, 450);
+        
     }
+    /// <summary>
+    /// Draws the shape in the bottem left corner.
+    /// </summary>
+    /// <param name="spriteBatch"></param> Used for drawing textures in MonoGame
     public void Draw(SpriteBatch spriteBatch)
     {
         for (int x = 0; x < 4; x++)
@@ -95,28 +104,14 @@ internal class TargetShape
 
             }
         }
-        //teken lings onder in de shape
     }
-
+    /// <summary>
+    /// Picks a random shape as the current shape
+    /// </summary>
     public void NewShape()
     {
-        
         currentShapeIndex = GameWorld.Random.Next(amountOffDifferentShapes);
     }
-
-
-    /*Things to do
-
-    * randomlie pick a shape
-    * place for all the default shapes
-    * check to see if the shape is made
-    * een boolean die alles aan en uit zet
-    * 
-    dingen
-    * max 4X4
-
-    */
-
-    }
+}
 
 
