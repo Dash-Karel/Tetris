@@ -30,9 +30,9 @@ namespace TetrisTemplate
             }
         }
 
-        public void NewEffect(Vector2 position, float direction, float speed, float distanceToLive = 20, string textureName = "whoosh", float rotationSpeed = 0f)
+        public void NewEffect(Vector2 position, float direction, float speed, Color color, float distanceToLive = 20, string textureName = "whoosh", float rotationSpeed = 0f)
         {
-            effects.Add(new Effect(position, direction, speed, this, distanceToLive, textureName, rotationSpeed));
+            effects.Add(new Effect(position, direction, speed, this, color, distanceToLive, textureName, rotationSpeed));
         }
 
         public void RemoveEffect(Effect effect)

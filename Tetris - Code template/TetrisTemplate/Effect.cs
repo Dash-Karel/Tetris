@@ -12,6 +12,8 @@ internal class Effect
     Vector2 velocity;
     Vector2 origin;
 
+    Color color;
+
     //direction as a rotation in radials
     float rotation;
     float rotationSpeed;
@@ -20,8 +22,8 @@ internal class Effect
     float distanceToLive;
 
     Texture2D texture;
-    
-    public Effect(Vector2 position, float direction, float speed, EffectsManager effectManager, float distanceToLive = 20, string textureName = "whoosh", float rotationSpeed = 0)
+
+    public Effect(Vector2 position, float direction, float speed, EffectsManager effectManager, Color color, float distanceToLive = 20, string textureName = "whoosh", float rotationSpeed = 0)
     {
         texture = TetrisGame.ContentManager.Load<Texture2D>(textureName);
         origin = new Vector2(texture.Width, texture.Height) / 2;
@@ -38,6 +40,8 @@ internal class Effect
 
         distanceTraveled = 0;
         this.distanceToLive = distanceToLive;
+
+        this.color = color;
     }
 
     public void Update(GameTime gameTime)
@@ -56,7 +60,7 @@ internal class Effect
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(texture, position + origin, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0);
+        spriteBatch.Draw(texture, position + origin, null, color, rotation, origin, 1f, SpriteEffects.None, 0);
     }
 
 }

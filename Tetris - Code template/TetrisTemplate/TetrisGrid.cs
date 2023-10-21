@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -186,15 +187,21 @@ class TetrisGrid
     }
 
     /// <summary>
-    /// Deletes a line and makes sure the lines above it are moved down
+    /// Deletes a line and makes sure the lines above it are moved down. Plays a nice deletion effect as well
     /// </summary>
     /// <param name="yCoordinate"></param> The y coordinate of the line that needs to be removed
     void DeleteLine(int yCoordinate)
     {
         //set every cell in the line to empty
-        for(int x = 0; x < Width; x++)
-        { 
-            Grid[x, yCoordinate] = CellType.empty;                
+        for (int x = 0; x < Width; x++)
+        {
+            //play effects
+            if (x < Width / 2)
+                TetrisGame.EffectsManager.NewEffect(GetPositionOfCell(new Point(x, yCoordinate)) + gameWorld.WorldOffset, 1.5f * MathF.PI, 350f, cellColors[(int)Grid[x, yCoordinate]], 5f, "block", 15f);
+            else
+                TetrisGame.EffectsManager.NewEffect(GetPositionOfCell(new Point(x, yCoordinate))+ gameWorld.WorldOffset, 0.5f * MathF.PI, 350f, cellColors[(int)Grid[x, yCoordinate]], 5f, "block", 15f);
+
+            Grid[x, yCoordinate] = CellType.empty;
         }
         //make sure the cells above are moved down
         MoveCellsDown(yCoordinate);

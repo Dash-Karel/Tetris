@@ -53,7 +53,7 @@ class GameWorld
     double rightHeldForSeconds;
     double downHeldForSeconds;
 
-    Vector2 worldOffset;
+    public Vector2 WorldOffset { get; private set; }
 
     Vector2 levelStringLocation, scoreStringLocation;
 
@@ -165,16 +165,16 @@ class GameWorld
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        grid.Draw(gameTime, spriteBatch, worldOffset);
-        block.Draw(spriteBatch, worldOffset);
-        previewBlock.Draw(spriteBatch, worldOffset);
+        grid.Draw(gameTime, spriteBatch, WorldOffset);
+        block.Draw(spriteBatch, WorldOffset);
+        previewBlock.Draw(spriteBatch, WorldOffset);
         if(holdBlock != null)
-            holdBlock.Draw(spriteBatch, worldOffset);
+            holdBlock.Draw(spriteBatch, WorldOffset);
         if (targetShapeMode)
-            targetShape.Draw(spriteBatch, worldOffset);
+            targetShape.Draw(spriteBatch, WorldOffset);
 
-        spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + worldOffset, Color.Yellow);
-        spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + worldOffset, Color.Yellow);
+        spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + WorldOffset, Color.Yellow);
+        spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + WorldOffset, Color.Yellow);
     }
 
     public void Reset(bool targetShapeMode)
@@ -292,7 +292,7 @@ class GameWorld
     }
     public void OffsetWorld(Vector2 offset)
     {
-        worldOffset = offset;
+        WorldOffset = offset;
     }
     public void ChangeKeyBindings(Keys moveLeft, Keys rotateLeft, Keys moveRight, Keys rotateRight, Keys moveDown, Keys hardDrop, Keys hold)
     {

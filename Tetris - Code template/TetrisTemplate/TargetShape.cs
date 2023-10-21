@@ -11,7 +11,7 @@ internal class TargetShape
     public TetrisGrid.CellType[,] Shape { get { return shape[currentShapeIndex]; } }
 
     int currentShapeIndex = 0;
-    const int amountOffDifferentShapes = 7;
+    const int amountOfDifferentShapes = 7;
 
     Vector2 position;
     Texture2D blockTexture;
@@ -19,7 +19,7 @@ internal class TargetShape
     public TargetShape(TetrisGrid grid)
     {
         //An array containing all the different shapes. With TetrisGrid CellTypes to indicate the coller. All shapes are a maximum of 4X4
-        shape = new TetrisGrid.CellType[amountOffDifferentShapes][,] {
+        shape = new TetrisGrid.CellType[amountOfDifferentShapes][,] {
             new TetrisGrid.CellType[4, 4] {
                 { TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow },
                 { TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow, TetrisGrid.CellType.yellow },
@@ -90,9 +90,10 @@ internal class TargetShape
         
     }
     /// <summary>
-    /// Draws the shape in the bottem left corner.
+    /// Draws the roughly shape in the bottem left corner.
     /// </summary>
-    /// <param name="spriteBatch"></param> Used for drawing textures in MonoGame
+    /// <param name="spriteBatch"></param> the SpriteBatch object to draw the textures with
+    /// <param name="worldOffset"></param> an offset that gets added to the position
     public void Draw(SpriteBatch spriteBatch, Vector2 worldOffset)
     {
         for (int x = 0; x < 4; x++)
@@ -110,8 +111,12 @@ internal class TargetShape
     /// </summary>
     public void NewShape()
     {
-        currentShapeIndex = GameWorld.Random.Next(amountOffDifferentShapes);
+        currentShapeIndex = GameWorld.Random.Next(amountOfDifferentShapes);
     }
+
+    /// <summary>
+    /// Makes sure the position is correct when the gameWorld gets a different size
+    /// </summary>
     public void ApplyResolutionSettings()
     {
         position = new Vector2(TetrisGame.WorldSize.X / 2 - 287, 355);
