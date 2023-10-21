@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using static Block;
@@ -94,12 +95,34 @@ internal class Block
                             for (int explosionX = -2; explosionX < 3; explosionX++)
                                 for (int explosionY = -2; explosionY < 3; explosionY++)
                                     grid.SetValueInGrid(new Point(position.X + x + explosionX, position.Y + y + explosionY), TetrisGrid.CellType.empty);
+
+                            //Creates the effect for the explosion
+                            float effectSpeed = 400f;
+                            float rotationSpeed = 10f;
+                            if (x - 1 < 0 || !shape[x - 1, y])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x - 1, position.Y + y)), 1.5f * MathF.PI, effectSpeed, 2f, "fire", rotationSpeed);
+                            if (x + 1 >= Size || !shape[x + 1, y])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x + 1, position.Y + y)), 0.5f * MathF.PI, effectSpeed, 2f, "fire", rotationSpeed);
+                            if (y - 1 < 0 || !shape[x, y - 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y - 1)), 1f * MathF.PI, effectSpeed, 2f, "fire", rotationSpeed);
+                            if (y + 1 >= Size || !shape[x, y + 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y + 1)), 0f, effectSpeed, 2f, "fire", rotationSpeed);
+                            if (x - 1 < 0 || y - 1 < 0 ||!shape[x - 1, y - 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x - 1, position.Y + y - 1)), 1.25f * MathF.PI, effectSpeed, 2.828f, "fire", rotationSpeed);
+                            if (x + 1 >= Size || y + 1 >= Size || !shape[x + 1, y + 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x + 1, position.Y + y + 1)), 0.25f * MathF.PI, effectSpeed, 2.828f, "fire", rotationSpeed);
+                            if (x - 1 < 0 || y + 1 >= Size || !shape[x - 1, y + 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x - 1, position.Y + y + 1)), 1.75f * MathF.PI, effectSpeed, 2.828f, "fire", rotationSpeed);
+                            if (x + 1 >= Size || y - 1 < 0 || !shape[x + 1, y - 1])
+                                TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y)), 0.75f * MathF.PI, effectSpeed, 2.828f, "fire", rotationSpeed);
                             break;
                         case BlockType.pushDown:
                             grid.PushCellsDown(new Point(position.X + x, position.Y + y));
+                            TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y)), 0f, 800f, grid.Height - (position.Y + y));
                             break;
                         case BlockType.pullUp:
                             grid.PullCellsUp((new Point(position.X + x, position.Y + y)));
+                            TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, grid.Height - 1)), 1f* MathF.PI, 800f, grid.Height - (position.Y + y) - 1);
                             break;
                     }
 

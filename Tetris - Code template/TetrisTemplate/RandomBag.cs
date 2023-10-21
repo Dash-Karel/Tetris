@@ -21,7 +21,7 @@ internal class RandomBag
 
 
     //The chance that a special block can spawn in percentages
-    const float specialBlockChance = 15;
+    const float specialBlockChance = 75;
 
     public RandomBag(GameWorld gameWorld)
     {

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using TetrisTemplate;
 
 class TetrisGame : Game
 {
@@ -31,7 +32,6 @@ class TetrisGame : Game
 
     GameWorld gameWorldPlayer1;
     GameWorld gameWorldPlayer2;
-    
 
     MediaPlayer mediaPlayer;
 
@@ -48,6 +48,8 @@ class TetrisGame : Game
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>
     public static ContentManager ContentManager { get; private set; }
+
+    public static EffectsManager EffectsManager{ get; private set; }
     public static bool UseSpecialBlocks { get; set; }
 
 
@@ -89,7 +91,7 @@ class TetrisGame : Game
     }
 
     protected override void LoadContent()
-    {
+    {   
         UseSpecialBlocks = true;
 
         gameState = GameState.MainMenu;
@@ -109,6 +111,8 @@ class TetrisGame : Game
         gameWorldPlayer2.Reset();
 
         mediaPlayer = new MediaPlayer();
+
+        EffectsManager = new EffectsManager();
 
         themeSong = ContentManager.Load<SoundEffect>("TetrisTheme");
         shittySong = ContentManager.Load<SoundEffect>("shittyMusic");
@@ -144,6 +148,7 @@ class TetrisGame : Game
                 gameWorldPlayer1.Update(gameTime, inputHelper);
                 if(is2Player)
                     gameWorldPlayer2.Update(gameTime, inputHelper);
+                EffectsManager.Update(gameTime);
                 lastGameState = gameState;
                 break;
             case GameState.GameOver:
@@ -181,6 +186,7 @@ class TetrisGame : Game
             gameWorldPlayer2.Draw(gameTime, spriteBatch);
         }
         gameWorldPlayer1.Draw(gameTime, spriteBatch);
+        EffectsManager.Draw(spriteBatch);
     }
 
     public void GameOver(bool gameOverCallerIsPlayerOne)
@@ -202,6 +208,7 @@ class TetrisGame : Game
         gameState = GameState.Playing;
         gameWorldPlayer1.Reset();
         gameWorldPlayer2.Reset();
+        EffectsManager.Reset();
     }
     public void StartNormalGame()
     {

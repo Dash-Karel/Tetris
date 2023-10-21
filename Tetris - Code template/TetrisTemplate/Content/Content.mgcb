@@ -109,6 +109,18 @@
 /processorParam:Quality=Best
 /build:explosionSound.wav
 
+#begin fire.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:fire.png
+
 #begin gameOverSound.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -169,4 +181,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:upArrow.png
+
+#begin whoosh.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:whoosh.png
 
