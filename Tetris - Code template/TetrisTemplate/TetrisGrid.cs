@@ -160,7 +160,7 @@ class TetrisGrid
                         
                         if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
                         {
-                            if (grid[x + xOfShape, yCoordinate + yOfShape] != shape[xOfShape, yOfShape])
+                            if (Grid[x + xOfShape, yCoordinate + yOfShape] != shape[xOfShape, yOfShape])
                             {
                                 isShape = false;
                             }
