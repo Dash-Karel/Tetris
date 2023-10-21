@@ -122,8 +122,9 @@ class TetrisGrid
             lineClearSound.Play();
         }
     }
-    public void CheckTargetShape(int[] yCoordinates, bool[,] shape, CellType cellType)
+    public bool CheckTargetShape(int[] yCoordinates, TetrisGrid.CellType[,] shape)
     {
+
         //Calculating the amount of empty lines in shape
         int emptyShapeLines = 0;
         for (int yOfShape = 0; yOfShape < shape.GetLength(0); yOfShape++)
@@ -131,7 +132,7 @@ class TetrisGrid
             bool shapeLineIsEmpty = true;
             for (int xOfShape = 0; xOfShape < shape.GetLength(1); xOfShape++)
             {
-                if (shape[xOfShape, yOfShape])
+                if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
                 {
                     shapeLineIsEmpty = false;
                 }
@@ -144,6 +145,7 @@ class TetrisGrid
         {
             if (yCoordinate >= Height - shape.GetLength(1) + 1|| yCoordinate < 0)
                 continue;
+
             for (int x = 0; x < Width - shape.GetLength(0) + 1; x++)
             {
                 bool isShape = true;
@@ -152,9 +154,9 @@ class TetrisGrid
                     for (int yOfShape = 0; yOfShape < shape.GetLength(1); yOfShape++)
                     {
                         
-                        if (shape[xOfShape, yOfShape])
+                        if (shape[xOfShape, yOfShape] != TetrisGrid.CellType.empty)
                         {
-                            if (grid[x + xOfShape, yCoordinate + yOfShape] != cellType)
+                            if (grid[x + xOfShape, yCoordinate + yOfShape] != shape[xOfShape, yOfShape])
                             {
                                 isShape = false;
                             }
@@ -176,7 +178,9 @@ class TetrisGrid
         {
             gameWorld.IncreaseScore(LinesCleared);
             lineClearSound.Play();
+            return true;
         }
+        return false;
     }
     void DeleteLine(int yCoordinate)
     {

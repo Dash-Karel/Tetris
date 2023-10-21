@@ -139,8 +139,8 @@ internal class Block
         for (int y = 0; y < numberOfChecks; y++)
             yCoordinates[y] = y + position.Y;
 
-        grid.CheckLines(yCoordinates);
         gameWorld.CheckTargetShape(yCoordinates);
+        grid.CheckLines(yCoordinates);
     }
     public void MoveToSpawnPosition()
     {
