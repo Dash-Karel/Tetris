@@ -190,7 +190,7 @@ internal class Block
             yCoordinates[y] = y + position.Y;
 
         if(TetrisGame.UseTargetShape)
-            gameWorld.CheckTargetShape(yCoordinates);
+            gameWorld.CheckTargetShape();
 
         grid.CheckLines(yCoordinates);
     }
