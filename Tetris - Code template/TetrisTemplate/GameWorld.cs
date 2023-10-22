@@ -309,7 +309,7 @@ class GameWorld
         gameOverSound.Play();
         game.GameOver(isPlayerOne);
     }
-    public void CheckTargetShape(int[] yCoordinates)
+    public void CheckTargetShape()
     {
         if (grid.CheckTargetShape(targetShape.Shape))
         {
