@@ -74,6 +74,8 @@ internal class MainMenu
         specialBlocksBut.Draw(_spriteBatch);
         targetShapeBut.Draw(_spriteBatch);
     }
+
+    //updates the positions of the buttons and texts
     public void ApplyResolutionSettings()
     {
         //Button positions

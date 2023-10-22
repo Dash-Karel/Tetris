@@ -22,7 +22,7 @@ internal class ToggleButton : Button
         color = _notPressedColor;
     }
     /// <summary>
-    /// If the button is pressed the boolen isPressed is switched.
+    /// If the button is pressed the boolean isPressed is switched.
     /// </summary>
     protected override void Pressed()
     {

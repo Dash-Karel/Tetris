@@ -18,7 +18,6 @@ class TetrisGame : Game
     }
 
     GameState gameState;
-    GameState lastGameState;
 
     bool is2Player = false;
 
@@ -43,6 +42,7 @@ class TetrisGame : Game
 
     Texture2D background, backgroundTargetShape;
     Texture2D background2Player, background2PlayerTargetShape;
+
     /// <summary>
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>
@@ -52,12 +52,7 @@ class TetrisGame : Game
 
     public static bool UseSpecialBlocks { get; set; }
 
-    public static bool UseTargetShape 
-    {
-        get;
-        set;
-    }
-
+    public static bool UseTargetShape { get;  set; }
 
     /// <summary>
     /// A static reference to the width and height of the screen.
@@ -150,7 +145,6 @@ class TetrisGame : Game
         switch (gameState)
         {
             case GameState.MainMenu:
-                lastGameState = gameState;
                 mainMenu.Update(inputHelper);
                 break;
             case GameState.Playing:
@@ -158,10 +152,8 @@ class TetrisGame : Game
                 if(is2Player)
                     gameWorldPlayer2.Update(gameTime, inputHelper);
                 EffectsManager.Update(gameTime);
-                lastGameState = gameState;
                 break;
             case GameState.GameOver:
-                lastGameState = gameState;
                 gameOverScreen.Update(inputHelper);
                 break;
         }
@@ -235,11 +227,11 @@ class TetrisGame : Game
     }
     public void StartTwoPlayerGame()
     {
+        Reset();
         if (!is2Player)
         {
             Switch2PlayerMode();
         }
-        Reset();
     }
     public void ReturnToMainMenu()
     {
