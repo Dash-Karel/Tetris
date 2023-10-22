@@ -49,14 +49,14 @@ internal class EffectsManager
     /// </summary>
     /// <param name="position"></param>The position at which the effect will start
     /// <param name="direction"></param>The direction the efect will move in and be rotated towards. Measured in radians. With 0 indicating downwards, 0.5 PI right, 1 PI up etc.
-    /// <param name="speed"></param>The speed at which the effect will move, measured in gameWorld units per second
+    /// <param name="speed"></param>The speed at which the effect will move, measured in world units per second
     /// <param name="color"></param> The color that gets applied to the effect
     /// <param name="distanceToLive"></param> The distance the effect will exist for, measured in grid units
     /// <param name="textureName"></param> The name of the texture the effect uses, "whoosh" by default
     /// <param name="rotationSpeed"></param> The speed the effects will rotate at, 0 by default, measured in radians per second
     public void NewEffect(Vector2 position, float direction, float speed, Color color, float distanceToLive = 20, string textureName = "whoosh", float rotationSpeed = 0f)
     {
-        effects.Add(new Effect(position, direction, speed, this, color, distanceToLive, textureName, rotationSpeed));
+        effects.Add(new Effect(position, direction, speed, color, distanceToLive, textureName, rotationSpeed));
     }
     
     /// <summary>
