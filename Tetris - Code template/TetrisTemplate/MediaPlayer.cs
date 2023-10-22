@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-
+/// <summary>
+/// This class is used instead of the built-in mediaplayer because it was buggy(happens with more people on the internet)
+/// </summary>
 internal class MediaPlayer
 {
-    //this class is used instead of the built-in mediaplayer because it was buggy(happens with more people on the internet)
-
     bool stopped = false;
     bool paused = false;
     int currentSong = 0;
@@ -29,10 +29,12 @@ internal class MediaPlayer
         if(!paused && !stopped)
             playingForSeconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
     }
+    //Ads a sound effect to list of sound effects
     public void AddSongToQueue(SoundEffect soundEffect)
     {
         songs.Add(soundEffect.CreateInstance());
     }
+    //Starts playing the current song.
     public void Play()
     {
         stopped = false;
@@ -42,7 +44,8 @@ internal class MediaPlayer
             songs[currentSong].Play();
         }
     }
-    void Stop()
+    //Stops the current song.
+    public void Stop()
     {
         playingForSeconds = 0;
         stopped = true;
@@ -50,6 +53,7 @@ internal class MediaPlayer
         if (songs[currentSong].State != SoundState.Stopped)
             songs[currentSong].Stop();
     }
+    //Pauses the current song.
     public void Pause()
     {
         paused = true;
