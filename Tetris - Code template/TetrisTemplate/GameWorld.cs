@@ -7,6 +7,7 @@ using System;
 /// <summary>
 /// A class for representing the game world.
 /// This contains the grid, the falling block, and everything else that the player can see/do.
+/// There can be multiple instances of gameWorld to allow two player mode
 /// </summary>
 class GameWorld
 {
@@ -26,14 +27,24 @@ class GameWorld
     /// </summary>
     TetrisGrid grid;
 
+    /// <summary>
+    /// a reference to the main game class
+    /// </summary>
     TetrisGame game;
 
+    //the current block the player can control
     Block block;
+
+    //the next block that gets shown as a preview
     Block previewBlock;
 
+    //the block that is shown in the hold block region, the player can swap to this block
     Block holdBlock;
+
+    //boolean to keep track of if the block has already been swapped.
     bool holdUsed;
 
+    //An instance of RandomBag is used to draw semi random blocks that are placed in a queue
     RandomBag bag;
 
     TargetShape targetShape;
@@ -42,21 +53,28 @@ class GameWorld
 
     Keys rotateLeftKey, moveLeftKey, rotateRightKey, moveRightKey, moveDownKey, hardDropKey, holdKey;
 
+    //used to keep track of how many seconds there are left until a tick(moves the block down) should occur
     float secondsUntilNextTick;
+
+    //the speed at which the block falls down
     float secondsPerTick = 1;
 
     int score;
     int level;
     int linesClearedSinceLevelUp;
 
+    //used for auto repeat, allows the player to hold a direction to move more quickly in that direction
     double leftHeldForSeconds;
     double rightHeldForSeconds;
     double downHeldForSeconds;
 
+    //The offset of the gameWorld instance, this is used to offset everything within the gameWorld to allow 2 Player mode
     public Vector2 WorldOffset { get; private set; }
 
+    //the locations of the texts used for displaying the score and level
     Vector2 levelStringLocation, scoreStringLocation;
 
+    //whether the instance of the gameWorld is player one or two
     bool isPlayerOne;
 
     public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space, Keys hold = Keys.LeftShift)
@@ -142,7 +160,6 @@ class GameWorld
             block.MoveDown();
             downHeldForSeconds = 0f;
         }
-        //code for hard dropping
         if (inputHelper.KeyPressed(hardDropKey))
             block.HardDrop();
 
@@ -264,6 +281,7 @@ class GameWorld
         secondsPerTick = MathF.Pow((0.8f - ((level - 1) * 0.007f)), level - 1);
     }
 
+    //used for multiplayer, this method moves everything one cell up
     public void ReceiveLine()
     {
         grid.MoveAllLinesUp();
@@ -289,6 +307,7 @@ class GameWorld
         //Resetting the tick timer.
         secondsUntilNextTick = secondsPerTick;
     }
+    //offsets the world, useful for multiplayer
     public void OffsetWorld(Vector2 offset)
     {
         WorldOffset = offset;

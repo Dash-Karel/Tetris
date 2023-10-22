@@ -19,6 +19,7 @@ class TetrisGame : Game
 
     GameState gameState;
 
+    //boolean indicates whether the game is in singlePlayer or multiplayer mode
     bool is2Player = false;
 
     SpriteBatch spriteBatch;
@@ -48,10 +49,20 @@ class TetrisGame : Game
     /// </summary>
     public static ContentManager ContentManager { get; private set; }
 
+    /// <summary>
+    /// A static reference to the EffectsManager object, used for fisplaying effects.
+    /// </summary>
     public static EffectsManager EffectsManager{ get; private set; }
 
+    /// <summary>
+    /// Whether the game should use special blocks or not
+    /// </summary>
     public static bool UseSpecialBlocks { get; set; }
 
+
+    /// <summary>
+    /// Whether the game should indicate a target shape or not
+    /// </summary>
     public static bool UseTargetShape { get;  set; }
 
     /// <summary>
@@ -59,6 +70,9 @@ class TetrisGame : Game
     /// </summary>
     public static Point WorldSize { get; private set; }
 
+    /// <summary>
+    /// Whether the game is in full screen or not, updates resolution settings on set
+    /// </summary>
     bool FullScreen
     {
         get { return graphics.IsFullScreen; }
@@ -128,6 +142,7 @@ class TetrisGame : Game
 
     protected override void Update(GameTime gameTime)
     {
+        //fullscreen controls
         if (inputHelper.KeyPressed(Keys.F5))
             FullScreen = !FullScreen;
 
@@ -139,9 +154,11 @@ class TetrisGame : Game
         if (inputHelper.KeyPressed(Keys.U))
             mediaPlayer.Skip();
 
+        //update general objects
         mediaPlayer.Update(gameTime);
         inputHelper.Update(gameTime);
 
+        //Update different menus and gameworlds based on the gameState
         switch (gameState)
         {
             case GameState.MainMenu:
@@ -162,7 +179,10 @@ class TetrisGame : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.LightGray);
+        //Draws everything scaled from the worldSize to the screen size
         spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, spriteScale);
+
+        //draws menus and gameworlds based on the game state
         switch (gameState)
         {
             case GameState.MainMenu:
@@ -178,8 +198,13 @@ class TetrisGame : Game
         }
         spriteBatch.End();
     }
+    /// <summary>
+    /// Draws everything related to the playing field(s)
+    /// </summary>
+    /// <param name="gameTime"></param>
     void DrawPlaying(GameTime gameTime)
     {
+        //picks a background based on the diffent game modes
         Texture2D currentBackround;
         if (is2Player)
             if (UseTargetShape)
@@ -191,12 +216,15 @@ class TetrisGame : Game
                 currentBackround = backgroundTargetShape;
             else
                 currentBackround = background;
-
+        //draws the background
         spriteBatch.Draw(currentBackround, Vector2.Zero, Color.White);
 
+        //draws the gameworld(s)
         gameWorldPlayer1.Draw(gameTime, spriteBatch);
         if(is2Player)
             gameWorldPlayer2.Draw(gameTime, spriteBatch);
+
+        //lets effectsManager draw all the effects on top of the worlds
         EffectsManager.Draw(spriteBatch);
     }
 
@@ -244,6 +272,9 @@ class TetrisGame : Game
     //----------------------------------------------------------------------------------------------------------------------------------
     //TWO PLAYER RELATED METHODS
 
+    /// <summary>
+    /// Toggles multiplayer mode and makes sure all positions of objects are updated accordingly
+    /// </summary>
     void Switch2PlayerMode()
     {
         is2Player = !is2Player;
@@ -267,12 +298,18 @@ class TetrisGame : Game
         }
     }
 
+    //Syncs the level of both players, so both their games are just as fast
     public void SyncLevel(int level)
     {
         gameWorldPlayer1.setLevel(level);
         if(is2Player)
             gameWorldPlayer2.setLevel(level);
     }
+
+    /// <summary>
+    /// Sends a line to the other player, this moves the entire grid of that player one cell up
+    /// </summary>
+    /// <param name="playerWhoSentIsPlayerOne">true when player two should receive a line false when player one should receive a line</param>
     public void SendLine(bool playerWhoSentIsPlayerOne)
     {
         if (is2Player)

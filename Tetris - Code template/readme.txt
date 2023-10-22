@@ -79,4 +79,6 @@ Added Extras:
 	Menus with buttons:
 		A main menu where some of the extras can be toggled on or off and the player can choose between multi- or singleplayer.
 		A game over menu where the player can return to the main menu or play again.
+	Auto repeat:
+		the player can hold the left or right key to move more quickly, instead of having to spam the buttons.
 	
