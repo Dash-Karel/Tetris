@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
 
 /// <summary>
 /// A class for representing the Tetris playing grid.

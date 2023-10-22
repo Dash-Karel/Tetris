@@ -115,7 +115,7 @@ internal class Block
             {
                 //play general placement effects
                 if (!grid.CellIsValid(new Point(position.X + x, position.Y + y + 1)) && shape[x,y])
-                    TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y + 1)), MathF.PI, 200f, Color.LightGray, 1, "dust", 10f);
+                    TetrisGame.EffectsManager.NewEffect(grid.GetPositionOfCell(new Point(position.X + x, position.Y + y + 1)) + gameWorld.WorldOffset, MathF.PI, 200f, Color.LightGray, 1, "dust", 10f);
             }
             for (int y = 0; y < Size; y++)
             {
@@ -189,8 +189,9 @@ internal class Block
         for (int y = 0; y < numberOfChecks; y++)
             yCoordinates[y] = y + position.Y;
 
-        
-        gameWorld.CheckTargetShape();
+        if(TetrisGame.UseTargetShape)
+            gameWorld.CheckTargetShape(yCoordinates);
+
         grid.CheckLines(yCoordinates);
     }
     /// <summary>
