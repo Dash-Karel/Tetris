@@ -230,6 +230,12 @@
 /processorParam:TextureFormat=Color
 /build:upArrow.png
 
+#begin veryShittySong.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:veryShittySong.mp3
+
 #begin whoosh.png
 /importer:TextureImporter
 /processor:TextureProcessor

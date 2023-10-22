@@ -34,8 +34,6 @@ class TetrisGame : Game
 
     MediaPlayer mediaPlayer;
 
-    SoundEffect themeSong, shittySong;
-
     GameOverScreen gameOverScreen;
     MainMenu mainMenu;
 
@@ -126,11 +124,9 @@ class TetrisGame : Game
 
         EffectsManager = new EffectsManager();
 
-        themeSong = ContentManager.Load<SoundEffect>("TetrisTheme");
-        shittySong = ContentManager.Load<SoundEffect>("shittyMusic");
-
-        mediaPlayer.AddSongToQueue(themeSong);
-        mediaPlayer.AddSongToQueue(shittySong);
+        mediaPlayer.AddSongToQueue(ContentManager.Load<SoundEffect>("TetrisTheme"));
+        mediaPlayer.AddSongToQueue(ContentManager.Load<SoundEffect>("shittyMusic"));
+        mediaPlayer.AddSongToQueue(ContentManager.Load<SoundEffect>("veryShittySong"));
 
         gameOverScreen = new GameOverScreen(font, this);
         mainMenu = new MainMenu(font, this);
