@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
-using TetrisTemplate;
 
 class TetrisGame : Game
 {
@@ -42,15 +41,22 @@ class TetrisGame : Game
 
     SpriteFont font;
 
-    Texture2D background;
-    Texture2D background2Player;
+    Texture2D background, backgroundTargetShape;
+    Texture2D background2Player, background2PlayerTargetShape;
     /// <summary>
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>
     public static ContentManager ContentManager { get; private set; }
 
     public static EffectsManager EffectsManager{ get; private set; }
+
     public static bool UseSpecialBlocks { get; set; }
+
+    public static bool UseTargetShape 
+    {
+        get;
+        set;
+    }
 
 
     /// <summary>
@@ -63,12 +69,6 @@ class TetrisGame : Game
         get { return graphics.IsFullScreen; }
         set { ApplyResolutionSettings(value); }
     }
-    public void SetMouseVisible(bool isVisible)
-    {
-        IsMouseVisible = isVisible;
-    }
-
-    bool targetShapeMode = true;
 
     [STAThread]
     static void Main(string[] args)
@@ -93,9 +93,7 @@ class TetrisGame : Game
     }
 
     protected override void LoadContent()
-    {   
-        UseSpecialBlocks = true;
-
+    {
         gameState = GameState.MainMenu;
         IsMouseVisible = true;
 
@@ -105,13 +103,15 @@ class TetrisGame : Game
 
         background = ContentManager.Load<Texture2D>("background");
         background2Player = ContentManager.Load<Texture2D>("backgroundTwoPlayers");
+        backgroundTargetShape = ContentManager.Load<Texture2D>("backgroundTargetShape");
+        background2PlayerTargetShape = ContentManager.Load<Texture2D>("backgroundTwoPlayersTargetShape");
 
         gameWorldPlayer1 = new GameWorld(this, font, true);
         gameWorldPlayer2 = new GameWorld(this, font, false, Keys.Left, Keys.I, Keys.Right, Keys.P, Keys.Down, Keys.RightControl, Keys.O);
 
 
-        gameWorldPlayer1.Reset(targetShapeMode);
-        gameWorldPlayer2.Reset(targetShapeMode);
+        gameWorldPlayer1.Reset();
+        gameWorldPlayer2.Reset();
 
         mediaPlayer = new MediaPlayer();
 
@@ -146,8 +146,6 @@ class TetrisGame : Game
                 mainMenu.Update(inputHelper);
                 break;
             case GameState.Playing:
-                if (gameState != lastGameState)
-                    Reset();
                 gameWorldPlayer1.Update(gameTime, inputHelper);
                 if(is2Player)
                     gameWorldPlayer2.Update(gameTime, inputHelper);
@@ -182,13 +180,23 @@ class TetrisGame : Game
     }
     void DrawPlaying(GameTime gameTime)
     {
-        spriteBatch.Draw(background, Vector2.Zero, Color.White);
+        Texture2D currentBackround;
         if (is2Player)
-        {
-            spriteBatch.Draw(background2Player, Vector2.Zero, Color.White);
-            gameWorldPlayer2.Draw(gameTime, spriteBatch);
-        }
+            if (UseTargetShape)
+                currentBackround = background2PlayerTargetShape;
+            else
+                currentBackround = background2Player;
+        else
+            if(UseTargetShape)
+                currentBackround = backgroundTargetShape;
+            else
+                currentBackround = background;
+
+        spriteBatch.Draw(currentBackround, Vector2.Zero, Color.White);
+
         gameWorldPlayer1.Draw(gameTime, spriteBatch);
+        if(is2Player)
+            gameWorldPlayer2.Draw(gameTime, spriteBatch);
         EffectsManager.Draw(spriteBatch);
     }
 
@@ -209,13 +217,13 @@ class TetrisGame : Game
     {
         IsMouseVisible = false;
         gameState = GameState.Playing;
-        gameWorldPlayer1.Reset(targetShapeMode);
-        gameWorldPlayer2.Reset(targetShapeMode);
+        gameWorldPlayer1.Reset();
+        gameWorldPlayer2.Reset();
         EffectsManager.Reset();
     }
     public void StartNormalGame()
     {
-        gameState = GameState.Playing;
+        Reset();
     }
     public void StartTwoPlayerGame()
     {
@@ -223,7 +231,7 @@ class TetrisGame : Game
         {
             Switch2PlayerMode();
         }
-        gameState = GameState.Playing;
+        Reset();
     }
     public void ReturnToMainMenu()
     {
@@ -247,7 +255,7 @@ class TetrisGame : Game
             ApplyResolutionSettings(FullScreen);
             gameWorldPlayer1.OffsetWorld(new Vector2(-WorldSize.X / 4, 0));
             gameWorldPlayer2.OffsetWorld(new Vector2(WorldSize.X / 4, 0));
-            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.E);
+            gameWorldPlayer1.ChangeKeyBindings(Keys.C, Keys.A, Keys.B, Keys.D, Keys.V, Keys.S, Keys.LeftShift);
         }
         else
         {

@@ -58,7 +58,6 @@ class GameWorld
     Vector2 levelStringLocation, scoreStringLocation;
 
     bool isPlayerOne;
-    bool targetShapeMode;
 
     public GameWorld(TetrisGame tetrisGame, SpriteFont font, bool isPlayerOne, Keys moveLeft = Keys.Left, Keys rotateLeft = Keys.A, Keys moveRight = Keys.Right, Keys rotateRight = Keys.D, Keys moveDown = Keys.Down, Keys hardDrop = Keys.Space, Keys hold = Keys.LeftShift)
     {
@@ -170,18 +169,17 @@ class GameWorld
         previewBlock.Draw(spriteBatch, WorldOffset);
         if(holdBlock != null)
             holdBlock.Draw(spriteBatch, WorldOffset);
-        if (targetShapeMode)
+        if (TetrisGame.UseTargetShape)
             targetShape.Draw(spriteBatch, WorldOffset);
 
         spriteBatch.DrawString(font, level.ToString(), levelStringLocation - font.MeasureString(level.ToString()) / 2 + WorldOffset, Color.Yellow);
         spriteBatch.DrawString(font, score.ToString(), scoreStringLocation - font.MeasureString(score.ToString()) / 2 + WorldOffset, Color.Yellow);
     }
 
-    public void Reset(bool targetShapeMode)
+    public void Reset()
     {
-        this.targetShapeMode = targetShapeMode;
 
-        if (targetShapeMode)
+        if (TetrisGame.UseTargetShape)
             targetShape = new TargetShape(grid);
 
         secondsUntilNextTick = secondsPerTick;
@@ -199,7 +197,8 @@ class GameWorld
     public void ApplyResolutionSettings()
     {
         grid.ApplyResolutionSettings();
-        targetShape.ApplyResolutionSettings();
+        if(TetrisGame.UseTargetShape)
+            targetShape.ApplyResolutionSettings();
         levelStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 - 228, 33);
         scoreStringLocation = new Vector2(TetrisGame.WorldSize.X / 2 + 228, 33);
     }
