@@ -135,10 +135,10 @@ class TetrisGame : Game
     {
         if (inputHelper.KeyPressed(Keys.F5))
             FullScreen = !FullScreen;
+
+        //media controls
         if(inputHelper.KeyPressed(Keys.T))
-            mediaPlayer.Pause();
-        if(inputHelper.KeyPressed(Keys.R))
-            mediaPlayer.Play();
+            mediaPlayer.TogglePlaying();
         if (inputHelper.KeyPressed(Keys.Y))
             mediaPlayer.Previous();
         if (inputHelper.KeyPressed(Keys.U))
